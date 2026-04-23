@@ -13,6 +13,7 @@
             --primary: #6366f1; --primary-hover: #4f46e5;
             --secondary: #10b981; --accent: #f43f5e; --warning: #f59e0b; --info: #0ea5e9;
             --border: #334155;
+            --ooredoo: #ef4444; --dhiraagu: #f97316;
         }
         * { box-sizing: border-box; font-family: 'Poppins', sans-serif; }
         body { background: var(--bg); color: var(--text); margin: 0; padding: 20px; }
@@ -39,12 +40,22 @@
         .text-purple { color: #c084fc !important; }
         .text-orange { color: #fb923c !important; }
         .text-cyan { color: #38bdf8 !important; }
+        .text-ooredoo { color: var(--ooredoo) !important; }
+        .text-dhiraagu { color: var(--dhiraagu) !important; }
         
         #formWrapper { display: none; }
         .form-group { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        
+        /* New Grid for Quotas */
+        .network-grid { display: grid; gap: 15px; margin-bottom: 20px; }
+        .network-row { display: grid; grid-template-columns: 80px 1fr 1fr; gap: 15px; align-items: center; }
+        .network-header { display: grid; grid-template-columns: 80px 1fr 1fr; gap: 15px; font-weight: bold; color: var(--text-muted); text-transform: uppercase; font-size: 0.85rem; border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-bottom: 5px; text-align: center;}
+        .network-header span:first-child { text-align: left; }
+
         label { font-size: 0.8rem; color: var(--text-muted); display: block; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px; }
-        input, select { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid var(--border); background: #0f172a; color: white; outline: none; font-size: 1rem; }
-        input:focus, select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2); }
+        .network-row label { margin-bottom: 0; font-size: 0.9rem; font-weight: 600; color: #fff; }
+        input { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid var(--border); background: #0f172a; color: white; outline: none; font-size: 1rem; text-align: center;}
+        input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2); }
         
         .charts-grid { display: grid; grid-template-columns: 1fr; gap: 20px; }
         @media (min-width: 900px) { 
@@ -54,13 +65,10 @@
         .chart-container { position: relative; height: 320px; width: 100%; margin-top: 15px;}
         
         .table-responsive { overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; text-align: left; min-width: 800px; }
+        table { width: 100%; border-collapse: collapse; text-align: left; min-width: 900px; }
         th { padding: 12px; border-bottom: 2px solid var(--border); color: var(--text-muted); font-size: 0.9rem; }
         td { padding: 15px 12px; border-bottom: 1px solid var(--border); font-size: 0.95rem; }
         .actions { display: flex; gap: 8px; }
-        .network-badge { padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: 600; background: #334155; }
-        .network-badge.ooredoo { color: #ef4444; }
-        .network-badge.dhiraagu { color: #f97316; }
     </style>
 </head>
 <body>
@@ -92,18 +100,7 @@
 
     <div id="formWrapper" class="card">
         <form id="logForm">
-            <div class="form-group" style="grid-template-columns: 1fr; max-width: 300px;">
-                <div>
-                    <label>Network Type</label>
-                    <select id="network_type">
-                        <option value="Ooredoo">Ooredoo</option>
-                        <option value="Dhiraagu">Dhiraagu</option>
-                    </select>
-                </div>
-            </div>
-
-            <hr style="border: 1px solid var(--border); margin: 20px 0;">
-
+            
             <h2 class="text-blue" style="border: none;">SI mi aharu mihaathanah target thah</h2>
             <div class="form-group">
                 <div><label>SSPS</label><input type="number" id="ssps" class="g1" value="0" min="0"></div>
@@ -117,15 +114,48 @@
 
             <hr style="border: 1px solid var(--border); margin: 30px 0;">
 
-            <h2 class="text-cyan" style="border: none;">Quota Allocated</h2>
-            <div class="form-group">
-                <div><label>SSPS Quota</label><input type="number" id="quota_ssps" class="q_group" value="0" min="0"></div>
-                <div><label>SAS Quota</label><input type="number" id="quota_sas" class="q_group" value="0" min="0"></div>
-                <div><label>IOSU Quota</label><input type="number" id="quota_g1_region" class="q_group" value="0" min="0"></div>
-                <div><label>SES Quota</label><input type="number" id="quota_ses" class="q_group" value="0" min="0"></div>
-                <div><label>CIS Quota</label><input type="number" id="quota_cis" class="q_group" value="0" min="0"></div>
-                <div><label>IIU Quota</label><input type="number" id="quota_iiu" class="q_group" value="0" min="0"></div>
-                <div><label>DAU Quota</label><input type="number" id="quota_dau" class="q_group" value="0" min="0"></div>
+            <h2 class="text-cyan" style="border: none;">Quota Allocated by Network</h2>
+            <div class="network-grid">
+                <div class="network-header">
+                    <span>Region</span>
+                    <span class="text-ooredoo">Ooredoo</span>
+                    <span class="text-dhiraagu">Dhiraagu</span>
+                </div>
+                <div class="network-row">
+                    <label>SSPS</label>
+                    <input type="number" id="q_o_ssps" class="q_o" value="0" min="0">
+                    <input type="number" id="q_d_ssps" class="q_d" value="0" min="0">
+                </div>
+                <div class="network-row">
+                    <label>SAS</label>
+                    <input type="number" id="q_o_sas" class="q_o" value="0" min="0">
+                    <input type="number" id="q_d_sas" class="q_d" value="0" min="0">
+                </div>
+                <div class="network-row">
+                    <label>IOSU</label>
+                    <input type="number" id="q_o_g1_region" class="q_o" value="0" min="0">
+                    <input type="number" id="q_d_g1_region" class="q_d" value="0" min="0">
+                </div>
+                <div class="network-row">
+                    <label>SES</label>
+                    <input type="number" id="q_o_ses" class="q_o" value="0" min="0">
+                    <input type="number" id="q_d_ses" class="q_d" value="0" min="0">
+                </div>
+                <div class="network-row">
+                    <label>CIS</label>
+                    <input type="number" id="q_o_cis" class="q_o" value="0" min="0">
+                    <input type="number" id="q_d_cis" class="q_d" value="0" min="0">
+                </div>
+                <div class="network-row">
+                    <label>IIU</label>
+                    <input type="number" id="q_o_iiu" class="q_o" value="0" min="0">
+                    <input type="number" id="q_d_iiu" class="q_d" value="0" min="0">
+                </div>
+                <div class="network-row">
+                    <label>DAU</label>
+                    <input type="number" id="q_o_dau" class="q_o" value="0" min="0">
+                    <input type="number" id="q_d_dau" class="q_d" value="0" min="0">
+                </div>
             </div>
             
             <hr style="border: 1px solid var(--border); margin: 30px 0;">
@@ -149,7 +179,7 @@
             </div>
 
             <div style="text-align: right; margin-top: 15px; color: var(--text-muted); font-size: 0.9rem;">
-                Subtotals &rarr; SI: <b id="sub_t1" class="text-blue">0</b> | Election: <b id="sub_t2" class="text-green">0</b> | Reports: <b id="sub_t3" class="text-orange">0</b> | Quotas: <b id="sub_q" class="text-cyan">0</b>
+                Subtotals &rarr; SI: <b id="sub_t1" class="text-blue">0</b> | Election: <b id="sub_t2" class="text-green">0</b> | Reports: <b id="sub_t3" class="text-orange">0</b> | Quotas: <span class="text-ooredoo">Ooredoo (<b id="sub_qo">0</b>)</span> + <span class="text-dhiraagu">Dhiraagu (<b id="sub_qd">0</b>)</span>
             </div>
 
             <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 20px; padding: 15px; font-size: 1.1rem;" id="submitBtn">SAVE DATA</button>
@@ -158,7 +188,7 @@
 
     <div class="charts-grid">
         <div class="card full-width">
-            <h2>Monitoring Trends Over Time</h2>
+            <h2>Monitoring & Quota Trends Over Time</h2>
             <div class="chart-container"><canvas id="mainChart"></canvas></div>
         </div>
 
@@ -181,7 +211,17 @@
         <h2>Data History & Management</h2>
         <div class="table-responsive">
             <table>
-                <thead><tr><th>Date</th><th>Network</th><th>SI Targets</th><th>Election Monitor</th><th>Quotas</th><th>Reports</th><th>Actions</th></tr></thead>
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>SI Targets</th>
+                        <th>Election Monitor</th>
+                        <th class="text-ooredoo">Ooredoo Quota</th>
+                        <th class="text-dhiraagu">Dhiraagu Quota</th>
+                        <th>Reports</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
                 <tbody id="historyBody"></tbody>
             </table>
         </div>
@@ -194,7 +234,7 @@
     Chart.defaults.borderColor = '#334155';
     Chart.defaults.set('plugins.datalabels', {
         color: '#ffffff',
-        font: { weight: 'bold', size: 12 }
+        font: { weight: 'bold', size: 10 }
     });
 
     let charts = {};
@@ -215,17 +255,19 @@
     }
 
     const calculateSubTotals = () => {
-        let t1 = 0, t2 = 0, t3 = 0, q = 0;
+        let t1 = 0, t2 = 0, t3 = 0, qo = 0, qd = 0;
         document.querySelectorAll('.g1').forEach(i => t1 += Number(i.value) || 0);
         document.querySelectorAll('.g2').forEach(i => t2 += Number(i.value) || 0);
         document.querySelectorAll('.g3').forEach(i => t3 += Number(i.value) || 0);
-        document.querySelectorAll('.q_group').forEach(i => q += Number(i.value) || 0);
+        document.querySelectorAll('.q_o').forEach(i => qo += Number(i.value) || 0);
+        document.querySelectorAll('.q_d').forEach(i => qd += Number(i.value) || 0);
         
         document.getElementById('sub_t1').innerText = t1;
         document.getElementById('sub_t2').innerText = t2;
         document.getElementById('sub_t3').innerText = t3;
-        document.getElementById('sub_q').innerText = q;
-        return { t1, t2, t3, q };
+        document.getElementById('sub_qo').innerText = qo;
+        document.getElementById('sub_qd').innerText = qd;
+        return { t1, t2, t3, qo, qd };
     };
 
     document.querySelectorAll('input').forEach(i => {
@@ -246,10 +288,10 @@
         document.getElementById('historyBody').innerHTML = globalLogs.map(log => `
             <tr>
                 <td>${log.date}</td>
-                <td><span class="network-badge ${log.network_type ? log.network_type.toLowerCase() : 'ooredoo'}">${log.network_type || 'Ooredoo'}</span></td>
                 <td class="text-blue" style="font-weight: bold;">${log.total1}</td>
                 <td class="text-green" style="font-weight: bold;">${log.total2}</td>
-                <td class="text-cyan" style="font-weight: bold;">${log.total_quota || 0}</td>
+                <td class="text-ooredoo" style="font-weight: bold;">${log.q_o_total || 0}</td>
+                <td class="text-dhiraagu" style="font-weight: bold;">${log.q_d_total || 0}</td>
                 <td class="text-orange" style="font-weight: bold;">${log.total3 || 0}</td>
                 <td class="actions">
                     <button class="btn btn-warning" onclick="editLog(${log.id})">Edit</button>
@@ -268,9 +310,10 @@
             data: { labels: dates, datasets: [
                 { label: 'SI Targets', data: chartLogs.map(l => l.total1), borderColor: '#818cf8', backgroundColor: '#818cf8', tension: 0.3 },
                 { label: 'Election Monitor', data: chartLogs.map(l => l.total2), borderColor: '#34d399', backgroundColor: '#34d399', tension: 0.3 },
-                { label: 'Quotas', data: chartLogs.map(l => l.total_quota || 0), borderColor: '#38bdf8', backgroundColor: '#38bdf8', tension: 0.3 }
+                { label: 'Ooredoo Quotas', data: chartLogs.map(l => l.q_o_total || 0), borderColor: '#ef4444', backgroundColor: '#ef4444', tension: 0.3 },
+                { label: 'Dhiraagu Quotas', data: chartLogs.map(l => l.q_d_total || 0), borderColor: '#f97316', backgroundColor: '#f97316', tension: 0.3 }
             ]},
-            options: { responsive: true, maintainAspectRatio: false, plugins: { datalabels: { align: 'top', offset: 5 } } }
+            options: { responsive: true, maintainAspectRatio: false, plugins: { datalabels: { align: 'top', offset: 5, display: function(context) { return context.dataset.data[context.dataIndex] > 0; } } } }
         });
 
         // 2. Reports Bar Chart
@@ -311,11 +354,15 @@
     document.getElementById('logForm').onsubmit = async (e) => {
         e.preventDefault();
         const payload = {
-            network_type: document.getElementById('network_type').value,
             ssps: Number(document.getElementById('ssps').value), sas: Number(document.getElementById('sas').value), g1_region: Number(document.getElementById('g1_region').value), ses: Number(document.getElementById('ses').value), cis: Number(document.getElementById('cis').value), iiu: Number(document.getElementById('iiu').value), dau: Number(document.getElementById('dau').value),
             g2_region: Number(document.getElementById('g2_region').value), male_area: Number(document.getElementById('male_area').value), si: Number(document.getElementById('si').value), ci: Number(document.getElementById('ci').value), ct: Number(document.getElementById('ct').value), cni: Number(document.getElementById('cni').value),
             daily_reports: Number(document.getElementById('daily_reports').value), weekly_reports: Number(document.getElementById('weekly_reports').value),
-            quota_ssps: Number(document.getElementById('quota_ssps').value), quota_sas: Number(document.getElementById('quota_sas').value), quota_g1_region: Number(document.getElementById('quota_g1_region').value), quota_ses: Number(document.getElementById('quota_ses').value), quota_cis: Number(document.getElementById('quota_cis').value), quota_iiu: Number(document.getElementById('quota_iiu').value), quota_dau: Number(document.getElementById('quota_dau').value)
+            
+            // Ooredoo Data
+            q_o_ssps: Number(document.getElementById('q_o_ssps').value), q_o_sas: Number(document.getElementById('q_o_sas').value), q_o_g1_region: Number(document.getElementById('q_o_g1_region').value), q_o_ses: Number(document.getElementById('q_o_ses').value), q_o_cis: Number(document.getElementById('q_o_cis').value), q_o_iiu: Number(document.getElementById('q_o_iiu').value), q_o_dau: Number(document.getElementById('q_o_dau').value),
+            
+            // Dhiraagu Data
+            q_d_ssps: Number(document.getElementById('q_d_ssps').value), q_d_sas: Number(document.getElementById('q_d_sas').value), q_d_g1_region: Number(document.getElementById('q_d_g1_region').value), q_d_ses: Number(document.getElementById('q_d_ses').value), q_d_cis: Number(document.getElementById('q_d_cis').value), q_d_iiu: Number(document.getElementById('q_d_iiu').value), q_d_dau: Number(document.getElementById('q_d_dau').value)
         };
 
         const method = editingId ? 'PUT' : 'POST';
@@ -324,7 +371,7 @@
         await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
         resetForm(); 
         refreshData();
-        toggleForm(); // Auto-hide form after save
+        toggleForm();
     };
 
     function editLog(id) {
@@ -337,12 +384,16 @@
         document.getElementById('submitBtn').style.background = 'var(--warning)';
         document.getElementById('submitBtn').style.color = '#000';
 
-        document.getElementById('network_type').value = log.network_type || 'Ooredoo';
-        
+        // Load Basic
         ['ssps','sas','g1_region','ses','cis','iiu','dau','g2_region','male_area','si','ci','ct','cni'].forEach(key => {
             document.getElementById(key).value = log[key] || 0;
         });
-        ['quota_ssps','quota_sas','quota_g1_region','quota_ses','quota_cis','quota_iiu','quota_dau'].forEach(key => {
+        
+        // Load Quotas
+        ['q_o_ssps','q_o_sas','q_o_g1_region','q_o_ses','q_o_cis','q_o_iiu','q_o_dau'].forEach(key => {
+            document.getElementById(key).value = log[key] || 0;
+        });
+        ['q_d_ssps','q_d_sas','q_d_g1_region','q_d_ses','q_d_cis','q_d_iiu','q_d_dau'].forEach(key => {
             document.getElementById(key).value = log[key] || 0;
         });
         
@@ -361,7 +412,6 @@
     function resetForm() {
         editingId = null;
         document.querySelectorAll('input[type="number"]').forEach(i => i.value = "0");
-        document.getElementById('network_type').value = 'Ooredoo';
         document.getElementById('submitBtn').innerText = 'SAVE DATA';
         document.getElementById('submitBtn').style.background = 'var(--primary)';
         document.getElementById('submitBtn').style.color = '#fff';
