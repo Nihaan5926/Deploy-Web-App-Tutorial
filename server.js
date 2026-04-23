@@ -4,6 +4,7 @@ const path = require('path');
 const cors = require('cors');
 const fs = require('fs');
 
+// Create the data folder for Dokploy volumes
 const dataDir = process.env.DB_DIR || path.join(__dirname, 'data');
 if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true });
 
@@ -12,6 +13,7 @@ const db = new Database(path.join(dataDir, 'dashboard.db'));
 
 app.use(cors());
 app.use(express.json());
+// Tell Express to serve the 'public' folder
 app.use(express.static('public'));
 
 // --- Database Setup ---
@@ -82,5 +84,5 @@ app.delete('/api/logs/:id', (req, res) => {
   res.json({ success: true });
 });
 
-const PORT = 3008;
+const PORT = process.env.PORT || 3008;
 app.listen(PORT, () => console.log(`Server: http://localhost:${PORT}`));
