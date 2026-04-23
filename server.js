@@ -28,31 +28,31 @@ db.exec(`
 `);
 
 // --- API Endpoints ---
-
-// READ All
 app.get('/api/data', (req, res) => {
   const logs = db.prepare('SELECT * FROM logs ORDER BY timestamp DESC').all();
   
   const aggregates = {
-    g1: { ssps: 0, sas: 0, region: 0, ses: 0, cis: 0, iiu: 0, dau: 0 },
-    g2: { region: 0, male: 0, si: 0, ci: 0, ct: 0, cni: 0 }
+    g1: { ssps: 0, sas: 0, region: 0, ses: 0, cis: 0, iiu: 0, dau: 0, total: 0 },
+    g2: { region: 0, male: 0, si: 0, ci: 0, ct: 0, cni: 0, total: 0 },
+    grandTotal: 0
   };
 
   logs.forEach(log => {
     aggregates.g1.ssps += log.ssps; aggregates.g1.sas += log.sas;
     aggregates.g1.region += log.g1_region; aggregates.g1.ses += log.ses;
     aggregates.g1.cis += log.cis; aggregates.g1.iiu += log.iiu;
-    aggregates.g1.dau += log.dau;
+    aggregates.g1.dau += log.dau; aggregates.g1.total += log.total1;
 
     aggregates.g2.region += log.g2_region; aggregates.g2.male += log.male_area;
     aggregates.g2.si += log.si; aggregates.g2.ci += log.ci;
-    aggregates.g2.ct += log.ct; aggregates.g2.cni += log.cni;
+    aggregates.g2.ct += log.ct; aggregates.g2.cni += log.cni; aggregates.g2.total += log.total2;
+    
+    aggregates.grandTotal += (log.total1 + log.total2);
   });
 
   res.json({ logs, aggregates });
 });
 
-// CREATE
 app.post('/api/logs', (req, res) => {
   const d = req.body;
   const date = new Date().toLocaleDateString('en-GB'); 
@@ -64,7 +64,6 @@ app.post('/api/logs', (req, res) => {
   res.json({ id: info.lastInsertRowid });
 });
 
-// UPDATE
 app.put('/api/logs/:id', (req, res) => {
   const d = req.body;
   const stmt = db.prepare(`
@@ -77,7 +76,6 @@ app.put('/api/logs/:id', (req, res) => {
   res.json({ success: true });
 });
 
-// DELETE
 app.delete('/api/logs/:id', (req, res) => {
   const stmt = db.prepare('DELETE FROM logs WHERE id = ?');
   stmt.run(req.params.id);
