@@ -1,48 +1,102 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>StatStream | Management</title>
+    <meta charset="UTF-8">
+    <title>StatStream Pro</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        body { font-family: sans-serif; padding: 20px; background: #f4f4f9; }
-        .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        input { padding: 8px; margin-right: 10px; }
-        button { padding: 8px 15px; cursor: pointer; background: #007bff; color: white; border: none; }
+        body { font-family: 'Segoe UI', sans-serif; margin: 40px; background: #f0f2f5; }
+        .container { max-width: 900px; margin: auto; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .full-width { grid-column: span 2; }
+        input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; }
+        button { width: 100%; padding: 10px; background: #2563eb; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        button:hover { background: #1d4ed8; }
+        ul { list-style: none; padding: 0; max-height: 200px; overflow-y: auto; }
+        li { padding: 8px; border-bottom: 1px solid #eee; font-size: 0.9em; }
     </style>
 </head>
 <body>
-    <div class="card">
-        <h2>Add Statistic</h2>
-        <input type="text" id="label" placeholder="Metric Name (e.g. Revenue)">
-        <input type="number" id="value" placeholder="Value">
-        <button onclick="saveStat()">Save Data</button>
-        
-        <hr>
-        <h2>Stored Data</h2>
-        <ul id="statList"></ul>
+
+    <div class="container">
+        <div class="card full-width">
+            <h1>StatStream Management</h1>
+        </div>
+
+        <div class="card">
+            <h3>Add New Entry</h3>
+            <input type="text" id="label" placeholder="Label (e.g., Week 1)">
+            <input type="number" id="value" placeholder="Value">
+            <button onclick="saveStat()">Update Database</button>
+        </div>
+
+        <div class="card">
+            <h3>Recent Logs</h3>
+            <ul id="statList"></ul>
+        </div>
+
+        <div class="card full-width">
+            <h3>Data Visualization</h3>
+            <canvas id="myChart"></canvas>
+        </div>
     </div>
 
     <script>
-        async function fetchStats() {
+        let myChart;
+
+        async function initChart(data) {
+            const ctx = document.getElementById('myChart').getContext('2d');
+            
+            // If chart exists, destroy it before re-creating (important for updates)
+            if (myChart) myChart.destroy();
+
+            myChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: data.map(row => row.label).reverse(),
+                    datasets: [{
+                        label: 'Metric Value',
+                        data: data.map(row => row.value).reverse(),
+                        borderColor: '#2563eb',
+                        backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                        fill: true,
+                        tension: 0.3
+                    }]
+                },
+                options: { responsive: true }
+            });
+        }
+
+        async function loadDashboard() {
             const res = await fetch('/api/stats');
             const data = await res.json();
+            
+            // Update List
             const list = document.getElementById('statList');
-            list.innerHTML = data.map(s => `<li><strong>${s.label}:</strong> ${s.value} <small>(${s.timestamp})</small></li>`).join('');
+            list.innerHTML = data.slice(0, 5).map(s => `<li><strong>${s.label}:</strong> ${s.value}</li>`).join('');
+            
+            // Update Chart
+            initChart(data);
         }
 
         async function saveStat() {
             const label = document.getElementById('label').value;
             const value = document.getElementById('value').value;
             
+            if(!label || !value) return alert("Please fill both fields");
+
             await fetch('/api/stats', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ label, value })
             });
-            
-            fetchStats(); // Refresh list
+
+            document.getElementById('label').value = '';
+            document.getElementById('value').value = '';
+            loadDashboard();
         }
 
-        fetchStats(); // Load on start
+        loadDashboard();
     </script>
 </body>
 </html>
