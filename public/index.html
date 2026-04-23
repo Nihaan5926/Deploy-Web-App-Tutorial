@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Monitoring Dashboard</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
         :root { 
@@ -16,7 +17,6 @@
         * { box-sizing: border-box; font-family: 'Poppins', sans-serif; }
         body { background: var(--bg); color: var(--text); margin: 0; padding: 20px; }
         
-        /* Header */
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 15px; }
         .header h1 { margin: 0; font-size: 1.8rem; background: linear-gradient(to right, #818cf8, #c084fc); -webkit-background-clip: text; color: transparent; }
         .btn { padding: 10px 20px; border-radius: 8px; border: none; cursor: pointer; font-weight: 600; transition: 0.2s; color: white; }
@@ -26,23 +26,29 @@
         
         .container { max-width: 1300px; margin: auto; }
         
-        /* Cards */
         .card { background: var(--card); padding: 25px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); border: 1px solid var(--border); margin-bottom: 20px; }
         .card h2 { font-size: 1.2rem; margin-top: 0; border-bottom: 1px solid var(--border); padding-bottom: 10px; color: #e2e8f0; }
+
+        /* Totals Dashboard Layout */
+        .totals-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 20px; }
+        .total-card { background: linear-gradient(135deg, #1e293b, #0f172a); border: 1px solid var(--border); padding: 25px; border-radius: 20px; text-align: center; }
+        .total-card h3 { margin: 0; font-size: 1rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
+        .total-card .number { font-size: 2.5rem; font-weight: 700; margin: 10px 0 0 0; color: #fff; }
+        .text-blue { color: #818cf8 !important; }
+        .text-green { color: #34d399 !important; }
+        .text-purple { color: #c084fc !important; }
         
-        /* Form */
+        /* Form Layout */
         #formWrapper { display: none; }
         .form-group { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 15px; margin-bottom: 20px; }
         label { font-size: 0.8rem; color: var(--text-muted); display: block; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px; }
         input { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid var(--border); background: #0f172a; color: white; outline: none; transition: 0.3s; font-size: 1rem; }
         input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2); }
-        .total-box { background: rgba(99, 102, 241, 0.1); border: 1px solid var(--primary); padding: 15px; border-radius: 10px; text-align: center; font-size: 1.2rem; font-weight: 700; color: #818cf8; }
-        .total-box.g2 { background: rgba(16, 185, 129, 0.1); border-color: var(--secondary); color: #34d399; }
         
         /* Charts Grid */
         .charts-grid { display: grid; grid-template-columns: 1fr; gap: 20px; }
         @media (min-width: 900px) { .charts-grid { grid-template-columns: 1fr 1fr; } }
-        .chart-container { position: relative; height: 300px; width: 100%; }
+        .chart-container { position: relative; height: 320px; width: 100%; margin-top: 15px;}
         
         /* Table */
         .table-responsive { overflow-x: auto; }
@@ -56,13 +62,28 @@
 
 <div class="container">
     <div class="header">
-        <h1>Monitoring Dashboard</h1>
-        <button class="btn btn-primary" onclick="toggleForm()" id="toggleBtn">+ New Entry</button>
+        <h1>Overview Dashboard</h1>
+        <button class="btn btn-primary" onclick="toggleForm()" id="toggleBtn">+ Data Entry Form</button>
+    </div>
+
+    <div class="totals-grid">
+        <div class="total-card">
+            <h3>Grand Total Monitoring</h3>
+            <p class="number text-purple" id="dash_grand">0</p>
+        </div>
+        <div class="total-card">
+            <h3>Total: SI Targets</h3>
+            <p class="number text-blue" id="dash_t1">0</p>
+        </div>
+        <div class="total-card">
+            <h3>Total: Election Monitor</h3>
+            <p class="number text-green" id="dash_t2">0</p>
+        </div>
     </div>
 
     <div id="formWrapper" class="card">
         <form id="logForm">
-            <h2 style="color: #818cf8;">SI Target Monitoring (Group 1)</h2>
+            <h2 class="text-blue" style="border: none;">SI mi aharu mihaathanah target thah</h2>
             <div class="form-group">
                 <div><label>Ssps</label><input type="number" id="ssps" class="g1" value="0"></div>
                 <div><label>SAS</label><input type="number" id="sas" class="g1" value="0"></div>
@@ -72,9 +93,10 @@
                 <div><label>IIU</label><input type="number" id="iiu" class="g1" value="0"></div>
                 <div><label>DAU</label><input type="number" id="dau" class="g1" value="0"></div>
             </div>
-            <div class="total-box">Group 1 Total: <span id="total1_display">0</span></div>
+            
+            <hr style="border: 1px solid var(--border); margin: 30px 0;">
 
-            <h2 style="color: #34d399; margin-top: 30px;">Election Monitoring (Group 2)</h2>
+            <h2 class="text-green" style="border: none;">Inthihaabaa gulhigen monitor kurevunu</h2>
             <div class="form-group">
                 <div><label>Region</label><input type="number" id="g2_region" class="g2" value="0"></div>
                 <div><label>Male Area</label><input type="number" id="male_area" class="g2" value="0"></div>
@@ -83,14 +105,17 @@
                 <div><label>Ct</label><input type="number" id="ct" class="g2" value="0"></div>
                 <div><label>Cni</label><input type="number" id="cni" class="g2" value="0"></div>
             </div>
-            <div class="total-box g2">Group 2 Total: <span id="total2_display">0</span></div>
+
+            <div style="text-align: right; margin-top: 15px; color: var(--text-muted);">
+                Entry Subtotals &rarr; SI: <b id="sub_t1" class="text-blue">0</b> | Election: <b id="sub_t2" class="text-green">0</b>
+            </div>
 
             <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 20px; padding: 15px; font-size: 1.1rem;" id="submitBtn">SAVE DATA</button>
         </form>
     </div>
 
     <div class="charts-grid">
-        <div class="card" style="grid-column: 1 / -1;"><div class="chart-container" style="height: 350px;"><canvas id="lineChart"></canvas></div></div>
+        <div class="card" style="grid-column: 1 / -1;"><div class="chart-container" style="height: 380px;"><canvas id="lineChart"></canvas></div></div>
         <div class="card"><h2>SI Targets Breakdown</h2><div class="chart-container"><canvas id="barChart"></canvas></div></div>
         <div class="card"><h2>Election Monitoring</h2><div class="chart-container"><canvas id="doughnutChart"></canvas></div></div>
     </div>
@@ -99,7 +124,7 @@
         <h2>Data History & Management</h2>
         <div class="table-responsive">
             <table>
-                <thead><tr><th>Date</th><th>Group 1 Total</th><th>Group 2 Total</th><th>Actions</th></tr></thead>
+                <thead><tr><th>Date</th><th>SI Targets</th><th>Election Monitor</th><th>Actions</th></tr></thead>
                 <tbody id="historyBody"></tbody>
             </table>
         </div>
@@ -107,6 +132,15 @@
 </div>
 
 <script>
+    // Register the datalabels plugin globally
+    Chart.register(ChartDataLabels);
+    Chart.defaults.color = '#94a3b8';
+    Chart.defaults.borderColor = '#334155';
+    Chart.defaults.set('plugins.datalabels', {
+        color: '#ffffff',
+        font: { weight: 'bold', size: 12 }
+    });
+
     let charts = {};
     let globalLogs = [];
     let editingId = null;
@@ -117,7 +151,7 @@
         const btn = document.getElementById('toggleBtn');
         if(fw.style.display === 'block') {
             fw.style.display = 'none';
-            btn.innerText = '+ New Entry';
+            btn.innerText = '+ Data Entry Form';
             if(!editingId) resetForm(); 
         } else {
             fw.style.display = 'block';
@@ -125,17 +159,17 @@
         }
     }
 
-    const calculateTotals = () => {
+    const calculateSubTotals = () => {
         let t1 = 0, t2 = 0;
         document.querySelectorAll('.g1').forEach(i => t1 += Number(i.value) || 0);
         document.querySelectorAll('.g2').forEach(i => t2 += Number(i.value) || 0);
-        document.getElementById('total1_display').innerText = t1;
-        document.getElementById('total2_display').innerText = t2;
+        document.getElementById('sub_t1').innerText = t1;
+        document.getElementById('sub_t2').innerText = t2;
         return { t1, t2 };
     };
 
     document.querySelectorAll('input').forEach(i => {
-        i.addEventListener('input', calculateTotals);
+        i.addEventListener('input', calculateSubTotals);
         i.addEventListener('focus', function() { this.select(); });
     });
 
@@ -145,12 +179,17 @@
         const data = await res.json();
         globalLogs = data.logs;
         
+        // Update Totals Dashboard Cards
+        document.getElementById('dash_grand').innerText = data.aggregates.grandTotal;
+        document.getElementById('dash_t1').innerText = data.aggregates.g1.total;
+        document.getElementById('dash_t2').innerText = data.aggregates.g2.total;
+
         // Populate Table
         document.getElementById('historyBody').innerHTML = globalLogs.map(log => `
             <tr>
                 <td>${log.date}</td>
-                <td style="color: #818cf8; font-weight: bold;">${log.total1}</td>
-                <td style="color: #34d399; font-weight: bold;">${log.total2}</td>
+                <td class="text-blue" style="font-weight: bold;">${log.total1}</td>
+                <td class="text-green" style="font-weight: bold;">${log.total2}</td>
                 <td class="actions">
                     <button class="btn btn-warning" onclick="editLog(${log.id})">Edit</button>
                     <button class="btn btn-danger" onclick="deleteLog(${log.id})">Delete</button>
@@ -162,27 +201,31 @@
         const chartLogs = [...globalLogs].reverse(); 
         const dates = chartLogs.map(l => l.date);
 
-        Chart.defaults.color = '#94a3b8';
-        Chart.defaults.borderColor = '#334155';
-
         if(charts.line) charts.line.destroy();
         charts.line = new Chart(document.getElementById('lineChart'), {
             type: 'line',
             data: { labels: dates, datasets: [
-                { label: 'Group 1', data: chartLogs.map(l => l.total1), borderColor: '#818cf8', tension: 0.3 },
-                { label: 'Group 2', data: chartLogs.map(l => l.total2), borderColor: '#34d399', tension: 0.3 }
+                { label: 'SI Targets', data: chartLogs.map(l => l.total1), borderColor: '#818cf8', backgroundColor: '#818cf8', tension: 0.3 },
+                { label: 'Election Monitor', data: chartLogs.map(l => l.total2), borderColor: '#34d399', backgroundColor: '#34d399', tension: 0.3 }
             ]},
-            options: { responsive: true, maintainAspectRatio: false }
+            options: { 
+                responsive: true, maintainAspectRatio: false,
+                plugins: { datalabels: { align: 'top', offset: 5 } }
+            }
         });
 
         if(charts.bar) charts.bar.destroy();
         charts.bar = new Chart(document.getElementById('barChart'), {
             type: 'bar',
             data: { labels: ['Ssps', 'SAS', 'Region', 'Ses', 'Cis', 'IIU', 'DAU'], datasets: [{
-                label: 'Totals', data: [data.aggregates.g1.ssps, data.aggregates.g1.sas, data.aggregates.g1.region, data.aggregates.g1.ses, data.aggregates.g1.cis, data.aggregates.g1.iiu, data.aggregates.g1.dau],
+                label: 'Total Accumulated', 
+                data: [data.aggregates.g1.ssps, data.aggregates.g1.sas, data.aggregates.g1.region, data.aggregates.g1.ses, data.aggregates.g1.cis, data.aggregates.g1.iiu, data.aggregates.g1.dau],
                 backgroundColor: '#818cf8', borderRadius: 4
             }]},
-            options: { responsive: true, maintainAspectRatio: false }
+            options: { 
+                responsive: true, maintainAspectRatio: false,
+                plugins: { datalabels: { anchor: 'end', align: 'bottom', color: '#fff' } }
+            }
         });
 
         if(charts.doughnut) charts.doughnut.destroy();
@@ -192,14 +235,20 @@
                 data: [data.aggregates.g2.region, data.aggregates.g2.male, data.aggregates.g2.si, data.aggregates.g2.ci, data.aggregates.g2.ct, data.aggregates.g2.cni],
                 backgroundColor: ['#10b981', '#34d399', '#059669', '#047857', '#065f46', '#a7f3d0'], borderWidth: 0
             }]},
-            options: { responsive: true, maintainAspectRatio: false, cutout: '70%' }
+            options: { 
+                responsive: true, maintainAspectRatio: false, cutout: '65%',
+                plugins: { datalabels: { 
+                    formatter: (value) => value > 0 ? value : '', // hide 0s on doughnut
+                    color: '#fff', font: { size: 14 }
+                }}
+            }
         });
     }
 
     // CRUD Actions
     document.getElementById('logForm').onsubmit = async (e) => {
         e.preventDefault();
-        const totals = calculateTotals();
+        const totals = calculateSubTotals();
         const payload = {
             ssps: Number(document.getElementById('ssps').value), sas: Number(document.getElementById('sas').value), g1_region: Number(document.getElementById('g1_region').value), ses: Number(document.getElementById('ses').value), cis: Number(document.getElementById('cis').value), iiu: Number(document.getElementById('iiu').value), dau: Number(document.getElementById('dau').value), total1: totals.t1,
             g2_region: Number(document.getElementById('g2_region').value), male_area: Number(document.getElementById('male_area').value), si: Number(document.getElementById('si').value), ci: Number(document.getElementById('ci').value), ct: Number(document.getElementById('ct').value), cni: Number(document.getElementById('cni').value), total2: totals.t2
@@ -228,7 +277,7 @@
         ['ssps','sas','g1_region','ses','cis','iiu','dau','g2_region','male_area','si','ci','ct','cni'].forEach(key => {
             document.getElementById(key).value = log[key];
         });
-        calculateTotals();
+        calculateSubTotals();
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
@@ -245,7 +294,7 @@
         document.getElementById('submitBtn').innerText = 'SAVE DATA';
         document.getElementById('submitBtn').style.background = 'var(--primary)';
         document.getElementById('submitBtn').style.color = '#fff';
-        calculateTotals();
+        calculateSubTotals();
     }
 
     refreshData();
