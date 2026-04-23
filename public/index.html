@@ -29,30 +29,31 @@
         .card { background: var(--card); padding: 25px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); border: 1px solid var(--border); margin-bottom: 20px; }
         .card h2 { font-size: 1.2rem; margin-top: 0; border-bottom: 1px solid var(--border); padding-bottom: 10px; color: #e2e8f0; }
 
-        /* Totals Dashboard Layout */
-        .totals-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 20px; }
-        .total-card { background: linear-gradient(135deg, #1e293b, #0f172a); border: 1px solid var(--border); padding: 25px; border-radius: 20px; text-align: center; }
-        .total-card h3 { margin: 0; font-size: 1rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
-        .total-card .number { font-size: 2.5rem; font-weight: 700; margin: 10px 0 0 0; color: #fff; }
+        .totals-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        .total-card { background: linear-gradient(135deg, #1e293b, #0f172a); border: 1px solid var(--border); padding: 20px; border-radius: 20px; text-align: center; }
+        .total-card h3 { margin: 0; font-size: 0.9rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
+        .total-card .number { font-size: 2.2rem; font-weight: 700; margin: 10px 0 0 0; color: #fff; }
+        
         .text-blue { color: #818cf8 !important; }
         .text-green { color: #34d399 !important; }
         .text-purple { color: #c084fc !important; }
+        .text-orange { color: #fb923c !important; }
         
-        /* Form Layout */
         #formWrapper { display: none; }
         .form-group { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 15px; margin-bottom: 20px; }
         label { font-size: 0.8rem; color: var(--text-muted); display: block; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px; }
-        input { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid var(--border); background: #0f172a; color: white; outline: none; transition: 0.3s; font-size: 1rem; }
+        input { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid var(--border); background: #0f172a; color: white; outline: none; font-size: 1rem; }
         input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2); }
         
-        /* Charts Grid */
         .charts-grid { display: grid; grid-template-columns: 1fr; gap: 20px; }
-        @media (min-width: 900px) { .charts-grid { grid-template-columns: 1fr 1fr; } }
+        @media (min-width: 900px) { 
+            .charts-grid { grid-template-columns: 1fr 1fr; } 
+            .full-width { grid-column: 1 / -1; }
+        }
         .chart-container { position: relative; height: 320px; width: 100%; margin-top: 15px;}
         
-        /* Table */
         .table-responsive { overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; text-align: left; min-width: 600px; }
+        table { width: 100%; border-collapse: collapse; text-align: left; min-width: 700px; }
         th { padding: 12px; border-bottom: 2px solid var(--border); color: var(--text-muted); font-size: 0.9rem; }
         td { padding: 15px 12px; border-bottom: 1px solid var(--border); font-size: 0.95rem; }
         .actions { display: flex; gap: 8px; }
@@ -68,16 +69,20 @@
 
     <div class="totals-grid">
         <div class="total-card">
-            <h3>Grand Total Monitoring</h3>
+            <h3>Grand Total Items</h3>
             <p class="number text-purple" id="dash_grand">0</p>
         </div>
         <div class="total-card">
-            <h3>Total: SI Targets</h3>
+            <h3>SI Targets</h3>
             <p class="number text-blue" id="dash_t1">0</p>
         </div>
         <div class="total-card">
-            <h3>Total: Election Monitor</h3>
+            <h3>Election Monitor</h3>
             <p class="number text-green" id="dash_t2">0</p>
+        </div>
+        <div class="total-card">
+            <h3>Total Reports</h3>
+            <p class="number text-orange" id="dash_t3">0</p>
         </div>
     </div>
 
@@ -106,8 +111,16 @@
                 <div><label>Cni</label><input type="number" id="cni" class="g2" value="0" min="0"></div>
             </div>
 
-            <div style="text-align: right; margin-top: 15px; color: var(--text-muted);">
-                Entry Subtotals &rarr; SI: <b id="sub_t1" class="text-blue">0</b> | Election: <b id="sub_t2" class="text-green">0</b>
+            <hr style="border: 1px solid var(--border); margin: 30px 0;">
+
+            <h2 class="text-orange" style="border: none;">Reports Data</h2>
+            <div class="form-group">
+                <div><label>Daily Reports Count</label><input type="number" id="daily_reports" class="g3" value="0" min="0"></div>
+                <div><label>Weekly Reports Count</label><input type="number" id="weekly_reports" class="g3" value="0" min="0"></div>
+            </div>
+
+            <div style="text-align: right; margin-top: 15px; color: var(--text-muted); font-size: 0.9rem;">
+                Subtotals &rarr; SI: <b id="sub_t1" class="text-blue">0</b> | Election: <b id="sub_t2" class="text-green">0</b> | Reports: <b id="sub_t3" class="text-orange">0</b>
             </div>
 
             <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 20px; padding: 15px; font-size: 1.1rem;" id="submitBtn">SAVE DATA</button>
@@ -115,15 +128,31 @@
     </div>
 
     <div class="charts-grid">
-        <div class="card"><h2>SI Targets Breakdown</h2><div class="chart-container"><canvas id="barChart"></canvas></div></div>
-        <div class="card"><h2>Election Monitoring</h2><div class="chart-container"><canvas id="doughnutChart"></canvas></div></div>
+        <div class="card full-width">
+            <h2>Activity Over Time (SI Targets & Election Monitor)</h2>
+            <div class="chart-container" style="height: 300px;"><canvas id="mainChart"></canvas></div>
+        </div>
+
+        <div class="card full-width">
+            <h2>Reports Submitted (Daily vs Weekly amounts)</h2>
+            <div class="chart-container" style="height: 250px;"><canvas id="reportsChart"></canvas></div>
+        </div>
+
+        <div class="card">
+            <h2>Accumulated SI Breakdown</h2>
+            <div class="chart-container"><canvas id="barChart"></canvas></div>
+        </div>
+        <div class="card">
+            <h2>Accumulated Election Monitoring</h2>
+            <div class="chart-container"><canvas id="doughnutChart"></canvas></div>
+        </div>
     </div>
 
     <div class="card">
         <h2>Data History & Management</h2>
         <div class="table-responsive">
             <table>
-                <thead><tr><th>Date</th><th>SI Targets</th><th>Election Monitor</th><th>Actions</th></tr></thead>
+                <thead><tr><th>Date</th><th>SI Targets</th><th>Election Monitor</th><th>Reports</th><th>Actions</th></tr></thead>
                 <tbody id="historyBody"></tbody>
             </table>
         </div>
@@ -131,7 +160,6 @@
 </div>
 
 <script>
-    // Register the datalabels plugin globally
     Chart.register(ChartDataLabels);
     Chart.defaults.color = '#94a3b8';
     Chart.defaults.borderColor = '#334155';
@@ -144,7 +172,6 @@
     let globalLogs = [];
     let editingId = null;
 
-    // --- UI Logic ---
     function toggleForm() {
         const fw = document.getElementById('formWrapper');
         const btn = document.getElementById('toggleBtn');
@@ -159,12 +186,15 @@
     }
 
     const calculateSubTotals = () => {
-        let t1 = 0, t2 = 0;
+        let t1 = 0, t2 = 0, t3 = 0;
         document.querySelectorAll('.g1').forEach(i => t1 += Number(i.value) || 0);
         document.querySelectorAll('.g2').forEach(i => t2 += Number(i.value) || 0);
+        document.querySelectorAll('.g3').forEach(i => t3 += Number(i.value) || 0);
+        
         document.getElementById('sub_t1').innerText = t1;
         document.getElementById('sub_t2').innerText = t2;
-        return { t1, t2 };
+        document.getElementById('sub_t3').innerText = t3;
+        return { t1, t2, t3 };
     };
 
     document.querySelectorAll('input').forEach(i => {
@@ -172,16 +202,16 @@
         i.addEventListener('focus', function() { this.select(); });
     });
 
-    // --- Data Management ---
     async function refreshData() {
         const res = await fetch('/api/data');
         const data = await res.json();
         globalLogs = data.logs;
         
-        // Update Totals Dashboard Cards
+        // Update Dashboard Top Cards
         document.getElementById('dash_grand').innerText = data.aggregates.grandTotal;
         document.getElementById('dash_t1').innerText = data.aggregates.g1.total;
         document.getElementById('dash_t2').innerText = data.aggregates.g2.total;
+        document.getElementById('dash_t3').innerText = data.aggregates.g3.total;
 
         // Populate Table
         document.getElementById('historyBody').innerHTML = globalLogs.map(log => `
@@ -189,6 +219,7 @@
                 <td>${log.date}</td>
                 <td class="text-blue" style="font-weight: bold;">${log.total1}</td>
                 <td class="text-green" style="font-weight: bold;">${log.total2}</td>
+                <td class="text-orange" style="font-weight: bold;">${log.total3 || 0}</td>
                 <td class="actions">
                     <button class="btn btn-warning" onclick="editLog(${log.id})">Edit</button>
                     <button class="btn btn-danger" onclick="deleteLog(${log.id})">Delete</button>
@@ -196,22 +227,33 @@
             </tr>
         `).join('');
 
+        // Prepare chart data (oldest to newest)
         const chartLogs = [...globalLogs].reverse(); 
         const dates = chartLogs.map(l => l.date);
 
-        if(charts.line) charts.line.destroy();
-        charts.line = new Chart(document.getElementById('lineChart'), {
+        // 1. Main Line Chart
+        if(charts.main) charts.main.destroy();
+        charts.main = new Chart(document.getElementById('mainChart'), {
             type: 'line',
             data: { labels: dates, datasets: [
                 { label: 'SI Targets', data: chartLogs.map(l => l.total1), borderColor: '#818cf8', backgroundColor: '#818cf8', tension: 0.3 },
                 { label: 'Election Monitor', data: chartLogs.map(l => l.total2), borderColor: '#34d399', backgroundColor: '#34d399', tension: 0.3 }
             ]},
-            options: { 
-                responsive: true, maintainAspectRatio: false,
-                plugins: { datalabels: { align: 'top', offset: 5 } }
-            }
+            options: { responsive: true, maintainAspectRatio: false, plugins: { datalabels: { align: 'top', offset: 5 } } }
         });
 
+        // 2. NEW Reports Chart (Bar chart for Daily vs Weekly values)
+        if(charts.reports) charts.reports.destroy();
+        charts.reports = new Chart(document.getElementById('reportsChart'), {
+            type: 'bar',
+            data: { labels: dates, datasets: [
+                { label: 'Daily Reports Amount', data: chartLogs.map(l => l.daily_reports || 0), backgroundColor: '#fb923c', borderRadius: 4 },
+                { label: 'Weekly Reports Amount', data: chartLogs.map(l => l.weekly_reports || 0), backgroundColor: '#fcd34d', borderRadius: 4 }
+            ]},
+            options: { responsive: true, maintainAspectRatio: false, plugins: { datalabels: { anchor: 'end', align: 'bottom' } } }
+        });
+
+        // 3. SI Breakdown Bar
         if(charts.bar) charts.bar.destroy();
         charts.bar = new Chart(document.getElementById('barChart'), {
             type: 'bar',
@@ -220,12 +262,10 @@
                 data: [data.aggregates.g1.ssps, data.aggregates.g1.sas, data.aggregates.g1.region, data.aggregates.g1.ses, data.aggregates.g1.cis, data.aggregates.g1.iiu, data.aggregates.g1.dau],
                 backgroundColor: '#818cf8', borderRadius: 4
             }]},
-            options: { 
-                responsive: true, maintainAspectRatio: false,
-                plugins: { datalabels: { anchor: 'end', align: 'bottom', color: '#fff' } }
-            }
+            options: { responsive: true, maintainAspectRatio: false, plugins: { datalabels: { anchor: 'end', align: 'bottom' } } }
         });
 
+        // 4. Election Doughnut
         if(charts.doughnut) charts.doughnut.destroy();
         charts.doughnut = new Chart(document.getElementById('doughnutChart'), {
             type: 'doughnut',
@@ -233,38 +273,29 @@
                 data: [data.aggregates.g2.region, data.aggregates.g2.male, data.aggregates.g2.si, data.aggregates.g2.ci, data.aggregates.g2.ct, data.aggregates.g2.cni],
                 backgroundColor: ['#10b981', '#34d399', '#059669', '#047857', '#065f46', '#a7f3d0'], borderWidth: 0
             }]},
-            options: { 
-                responsive: true, maintainAspectRatio: false, cutout: '65%',
-                plugins: { datalabels: { 
-                    formatter: (value) => value > 0 ? value : '', 
-                    color: '#fff', font: { size: 14 }
-                }}
-            }
+            options: { responsive: true, maintainAspectRatio: false, cutout: '65%', plugins: { datalabels: { formatter: (value) => value > 0 ? value : '', color: '#fff' } } }
         });
     }
 
-    // CRUD Actions
     document.getElementById('logForm').onsubmit = async (e) => {
         e.preventDefault();
         const totals = calculateSubTotals();
         const payload = {
             ssps: Number(document.getElementById('ssps').value), sas: Number(document.getElementById('sas').value), g1_region: Number(document.getElementById('g1_region').value), ses: Number(document.getElementById('ses').value), cis: Number(document.getElementById('cis').value), iiu: Number(document.getElementById('iiu').value), dau: Number(document.getElementById('dau').value), total1: totals.t1,
-            g2_region: Number(document.getElementById('g2_region').value), male_area: Number(document.getElementById('male_area').value), si: Number(document.getElementById('si').value), ci: Number(document.getElementById('ci').value), ct: Number(document.getElementById('ct').value), cni: Number(document.getElementById('cni').value), total2: totals.t2
+            g2_region: Number(document.getElementById('g2_region').value), male_area: Number(document.getElementById('male_area').value), si: Number(document.getElementById('si').value), ci: Number(document.getElementById('ci').value), ct: Number(document.getElementById('ct').value), cni: Number(document.getElementById('cni').value), total2: totals.t2,
+            daily_reports: Number(document.getElementById('daily_reports').value), weekly_reports: Number(document.getElementById('weekly_reports').value), total3: totals.t3
         };
 
         const method = editingId ? 'PUT' : 'POST';
         const url = editingId ? `/api/logs/${editingId}` : '/api/logs';
 
         await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-        
-        resetForm();
-        refreshData();
+        resetForm(); refreshData();
     };
 
     function editLog(id) {
         const log = globalLogs.find(l => l.id === id);
         if(!log) return;
-        
         editingId = id;
         document.getElementById('formWrapper').style.display = 'block';
         document.getElementById('toggleBtn').innerText = 'Hide Form';
@@ -273,16 +304,17 @@
         document.getElementById('submitBtn').style.color = '#000';
 
         ['ssps','sas','g1_region','ses','cis','iiu','dau','g2_region','male_area','si','ci','ct','cni'].forEach(key => {
-            document.getElementById(key).value = log[key];
+            document.getElementById(key).value = log[key] || 0;
         });
-        calculateSubTotals();
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        document.getElementById('daily_reports').value = log.daily_reports || 0;
+        document.getElementById('weekly_reports').value = log.weekly_reports || 0;
+        
+        calculateSubTotals(); window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     async function deleteLog(id) {
         if(confirm("Are you sure you want to delete this entry?")) {
-            await fetch(`/api/logs/${id}`, { method: 'DELETE' });
-            refreshData();
+            await fetch(`/api/logs/${id}`, { method: 'DELETE' }); refreshData();
         }
     }
 
