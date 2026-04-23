@@ -1,5 +1,5 @@
 {
-  "name": "sales-dashboard",
+  "name": "sales-dashboard-mobile",
   "version": "1.0.0",
   "main": "server.js",
   "dependencies": {
@@ -7,7 +7,5 @@
     "better-sqlite3": "^9.0.0",
     "cors": "^2.8.5"
   },
-  "scripts": {
-    "start": "node server.js"
-  }
+  "scripts": { "start": "node server.js" }
 }
