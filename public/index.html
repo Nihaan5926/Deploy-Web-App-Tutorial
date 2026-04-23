@@ -46,7 +46,7 @@
         #formWrapper { display: none; }
         .form-group { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 15px; margin-bottom: 20px; }
         
-        /* New Grid for Quotas */
+        /* Network Grid for Quotas */
         .network-grid { display: grid; gap: 15px; margin-bottom: 20px; }
         .network-row { display: grid; grid-template-columns: 80px 1fr 1fr; gap: 15px; align-items: center; }
         .network-header { display: grid; grid-template-columns: 80px 1fr 1fr; gap: 15px; font-weight: bold; color: var(--text-muted); text-transform: uppercase; font-size: 0.85rem; border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-bottom: 5px; text-align: center;}
@@ -93,7 +93,7 @@
             <p class="number text-green" id="dash_t2">0</p>
         </div>
         <div class="total-card">
-            <h3>Total Quotas</h3>
+            <h3>Total Combined Quota</h3>
             <p class="number text-cyan" id="dash_quota">0</p>
         </div>
     </div>
@@ -187,9 +187,24 @@
     </div>
 
     <div class="charts-grid">
+        
         <div class="card full-width">
-            <h2>Monitoring & Quota Trends Over Time</h2>
-            <div class="chart-container"><canvas id="mainChart"></canvas></div>
+            <h2>Detailed Quota Allocation by Network</h2>
+            
+            <div class="totals-grid" style="margin-bottom: 20px;">
+                <div class="total-card" style="border-top: 3px solid var(--ooredoo);">
+                    <h3>Total Ooredoo Quota</h3>
+                    <p class="number text-ooredoo" id="dash_ooredoo">0</p>
+                </div>
+                <div class="total-card" style="border-top: 3px solid var(--dhiraagu);">
+                    <h3>Total Dhiraagu Quota</h3>
+                    <p class="number text-dhiraagu" id="dash_dhiraagu">0</p>
+                </div>
+            </div>
+
+            <div class="chart-container" style="height: 350px;">
+                <canvas id="networkQuotaChart"></canvas>
+            </div>
         </div>
 
         <div class="card full-width">
@@ -201,6 +216,7 @@
             <h2>SI REGULAR MONITORING</h2>
             <div class="chart-container"><canvas id="barChart"></canvas></div>
         </div>
+        
         <div class="card">
             <h2>LCE2026 INTHIHAABU MONITORED TARGETS</h2>
             <div class="chart-container"><canvas id="doughnutChart"></canvas></div>
@@ -280,11 +296,17 @@
         const data = await res.json();
         globalLogs = data.logs;
         
+        // Populate Top Grand Totals
         document.getElementById('dash_grand').innerText = data.aggregates.grandTotal;
         document.getElementById('dash_t1').innerText = data.aggregates.g1.total;
         document.getElementById('dash_t2').innerText = data.aggregates.g2.total;
         document.getElementById('dash_quota').innerText = data.aggregates.quota.total;
+        
+        // Populate Network Specific Totals
+        document.getElementById('dash_ooredoo').innerText = data.aggregates.quota.ooredoo;
+        document.getElementById('dash_dhiraagu').innerText = data.aggregates.quota.dhiraagu;
 
+        // Populate Table
         document.getElementById('historyBody').innerHTML = globalLogs.map(log => `
             <tr>
                 <td>${log.date}</td>
@@ -303,17 +325,38 @@
         const chartLogs = [...globalLogs].reverse(); 
         const dates = chartLogs.map(l => l.date);
 
-        // 1. Main Line Chart
-        if(charts.main) charts.main.destroy();
-        charts.main = new Chart(document.getElementById('mainChart'), {
-            type: 'line',
-            data: { labels: dates, datasets: [
-                { label: 'SI Targets', data: chartLogs.map(l => l.total1), borderColor: '#818cf8', backgroundColor: '#818cf8', tension: 0.3 },
-                { label: 'Election Monitor', data: chartLogs.map(l => l.total2), borderColor: '#34d399', backgroundColor: '#34d399', tension: 0.3 },
-                { label: 'Ooredoo Quotas', data: chartLogs.map(l => l.q_o_total || 0), borderColor: '#ef4444', backgroundColor: '#ef4444', tension: 0.3 },
-                { label: 'Dhiraagu Quotas', data: chartLogs.map(l => l.q_d_total || 0), borderColor: '#f97316', backgroundColor: '#f97316', tension: 0.3 }
-            ]},
-            options: { responsive: true, maintainAspectRatio: false, plugins: { datalabels: { align: 'top', offset: 5, display: function(context) { return context.dataset.data[context.dataIndex] > 0; } } } }
+        // Calculate Regional Totals for Network Quotas dynamically
+        let q_o = { ssps: 0, sas: 0, region: 0, ses: 0, cis: 0, iiu: 0, dau: 0 };
+        let q_d = { ssps: 0, sas: 0, region: 0, ses: 0, cis: 0, iiu: 0, dau: 0 };
+
+        globalLogs.forEach(log => {
+            q_o.ssps += log.q_o_ssps || 0; q_o.sas += log.q_o_sas || 0; q_o.region += log.q_o_g1_region || 0;
+            q_o.ses += log.q_o_ses || 0; q_o.cis += log.q_o_cis || 0; q_o.iiu += log.q_o_iiu || 0; q_o.dau += log.q_o_dau || 0;
+            
+            q_d.ssps += log.q_d_ssps || 0; q_d.sas += log.q_d_sas || 0; q_d.region += log.q_d_g1_region || 0;
+            q_d.ses += log.q_d_ses || 0; q_d.cis += log.q_d_cis || 0; q_d.iiu += log.q_d_iiu || 0; q_d.dau += log.q_d_dau || 0;
+        });
+
+        // 1. NEW: Detailed Network Quota Bar Chart
+        if(charts.networkQuota) charts.networkQuota.destroy();
+        charts.networkQuota = new Chart(document.getElementById('networkQuotaChart'), {
+            type: 'bar',
+            data: { 
+                labels: ['Ssps', 'SAS', 'IOSU', 'Ses', 'Cis', 'IIU', 'DAU'], 
+                datasets: [
+                    { label: 'Ooredoo Allocation', data: [q_o.ssps, q_o.sas, q_o.region, q_o.ses, q_o.cis, q_o.iiu, q_o.dau], backgroundColor: '#ef4444', borderRadius: 4 },
+                    { label: 'Dhiraagu Allocation', data: [q_d.ssps, q_d.sas, q_d.region, q_d.ses, q_d.cis, q_d.iiu, q_d.dau], backgroundColor: '#f97316', borderRadius: 4 }
+                ]
+            },
+            options: { 
+                responsive: true, maintainAspectRatio: false, 
+                plugins: { 
+                    datalabels: { 
+                        anchor: 'end', align: 'top', color: '#fff', 
+                        formatter: (value) => value > 0 ? value : '' 
+                    } 
+                }
+            }
         });
 
         // 2. Reports Bar Chart
