@@ -13,41 +13,38 @@ app.use(express.static('public'));
 // --- Database Setup ---
 db.exec(`
   CREATE TABLE IF NOT EXISTS transactions (
-    id INTEGER PRIMARY KEY,
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT,
     date TEXT,
     amount REAL,
-    image TEXT
-  );
-
-  CREATE TABLE IF NOT EXISTS stats (
-    key TEXT PRIMARY KEY,
-    value TEXT
+    device TEXT
   );
 `);
 
-// Seed data if empty
-const rowCount = db.prepare('SELECT count(*) as count FROM transactions').get();
-if (rowCount.count === 0) {
-  const insert = db.prepare('INSERT INTO transactions (id, name, date, amount, image) VALUES (?, ?, ?, ?, ?)');
-  insert.run(1025, 'Jessica Alba', '05.10.22', 300.00, 'https://i.pravatar.cc/50?u=1');
-  insert.run(1026, 'Denisse James', '05.10.22', 450.00, 'https://i.pravatar.cc/50?u=2');
-  insert.run(1027, 'Kat Addams', '05.10.22', 100.00, 'https://i.pravatar.cc/50?u=3');
-  insert.run(1028, 'Lisa Woods', '05.10.22', 250.00, 'https://i.pravatar.cc/50?u=4');
-}
-
 // --- API Endpoints ---
+
+// Get all transactions
 app.get('/api/data', (req, res) => {
-  const transactions = db.prepare('SELECT * FROM transactions').all();
+  const transactions = db.prepare('SELECT * FROM transactions ORDER BY id DESC').all();
+  
+  // Calculate device distribution for the pie chart
+  const counts = { desktop: 0, tablet: 0, mobile: 0 };
+  transactions.forEach(t => { if(counts[t.device] !== undefined) counts[t.device]++; });
+  
   res.json({
-    topProduct: "Floral Skirt",
-    topProductValue: 91,
-    thisYear: 15000.00,
-    lastYear: 9000.00,
-    salesReport: { desktop: 60, tablet: 30, mobile: 10 },
-    transactions: transactions
+    transactions: transactions,
+    deviceStats: counts
   });
 });
 
-const PORT = 3008;
-app.listen(PORT, () => console.log(`Server running at http://localhost:${PORT}`));
+// Add new transaction
+app.post('/api/transactions', (req, res) => {
+  const { name, amount, device } = req.body;
+  const date = new Date().toLocaleDateString('en-GB').replace(/\//g, '.');
+  const stmt = db.prepare('INSERT INTO transactions (name, date, amount, device) VALUES (?, ?, ?, ?)');
+  const info = stmt.run(name, amount, device);
+  res.json({ id: info.lastInsertRowid });
+});
+
+const PORT = 3000;
+app.listen(PORT, () => console.log(`Server: http://localhost:${PORT}`));
