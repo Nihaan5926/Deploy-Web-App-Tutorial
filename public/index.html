@@ -2,101 +2,119 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>StatStream Pro</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Statistics Dashboard</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; margin: 40px; background: #f0f2f5; }
-        .container { max-width: 900px; margin: auto; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        .card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-        .full-width { grid-column: span 2; }
-        input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; }
-        button { width: 100%; padding: 10px; background: #2563eb; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
-        button:hover { background: #1d4ed8; }
-        ul { list-style: none; padding: 0; max-height: 200px; overflow-y: auto; }
-        li { padding: 8px; border-bottom: 1px solid #eee; font-size: 0.9em; }
+        :root {
+            --bg: #F0F2F5;
+            --card: #FFFFFF;
+            --primary: #00D1FF;
+            --dark: #1A1F3D;
+        }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 40px; }
+        .dashboard { max-width: 900px; margin: auto; background: var(--card); border-radius: 30px; padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+        .grid { display: grid; grid-template-columns: 1fr 2fr; gap: 20px; }
+        
+        .card-dark { background: var(--dark); color: white; border-radius: 20px; padding: 20px; text-align: center; }
+        .progress-circle { width: 100px; height: 100px; border: 8px solid var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px; font-size: 24px; font-weight: bold; }
+        
+        .stats-bar-chart { background: #f9f9f9; border-radius: 20px; padding: 20px; }
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th { text-align: left; color: #999; font-size: 12px; padding-bottom: 10px; }
+        td { padding: 12px 0; border-bottom: 1px solid #eee; font-size: 14px; }
+        .user-img { width: 30px; height: 30px; border-radius: 50%; vertical-align: middle; margin-right: 10px; }
+        
+        .highlight { background: #E0F7FF; color: #000; font-weight: bold; }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <div class="card full-width">
-            <h1>StatStream Management</h1>
+<div class="dashboard">
+    <div class="grid">
+        <div class="card-dark">
+            <div class="progress-circle" id="topScore">0</div>
+            <p>Top Product Sales</p>
+            <h2 id="topProduct" style="color: var(--primary);">Loading...</h2>
         </div>
 
-        <div class="card">
-            <h3>Add New Entry</h3>
-            <input type="text" id="label" placeholder="Label (e.g., Week 1)">
-            <input type="number" id="value" placeholder="Value">
-            <button onclick="saveStat()">Update Database</button>
-        </div>
-
-        <div class="card">
-            <h3>Recent Logs</h3>
-            <ul id="statList"></ul>
-        </div>
-
-        <div class="card full-width">
-            <h3>Data Visualization</h3>
-            <canvas id="myChart"></canvas>
+        <div class="stats-bar-chart">
+            <div style="display: flex; justify-content: space-between;">
+                <div><small>This Year</small><div id="thisYear" style="color:var(--primary); font-weight:bold;">$0</div></div>
+                <div><small>Last Year</small><div id="lastYear" style="font-weight:bold;">$0</div></div>
+            </div>
+            <canvas id="barChart" height="100"></canvas>
         </div>
     </div>
 
-    <script>
-        let myChart;
+    <div class="grid" style="margin-top: 40px;">
+        <div>
+            <h3>TRANSACTIONS</h3>
+            <table>
+                <thead><tr><th>ID</th><th>NAME</th><th>DATE</th><th>AMOUNT</th></tr></thead>
+                <tbody id="transactionBody"></tbody>
+            </table>
+        </div>
 
-        async function initChart(data) {
-            const ctx = document.getElementById('myChart').getContext('2d');
-            
-            // If chart exists, destroy it before re-creating (important for updates)
-            if (myChart) myChart.destroy();
+        <div style="text-align: center;">
+            <h3>SALES REPORT</h3>
+            <canvas id="pieChart" width="200" height="200"></canvas>
+        </div>
+    </div>
+</div>
 
-            myChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: data.map(row => row.label).reverse(),
-                    datasets: [{
-                        label: 'Metric Value',
-                        data: data.map(row => row.value).reverse(),
-                        borderColor: '#2563eb',
-                        backgroundColor: 'rgba(37, 99, 235, 0.1)',
-                        fill: true,
-                        tension: 0.3
-                    }]
-                },
-                options: { responsive: true }
-            });
-        }
+<script>
+    async function fetchData() {
+        const res = await fetch('/api/data');
+        const data = await res.json();
 
-        async function loadDashboard() {
-            const res = await fetch('/api/stats');
-            const data = await res.json();
-            
-            // Update List
-            const list = document.getElementById('statList');
-            list.innerHTML = data.slice(0, 5).map(s => `<li><strong>${s.label}:</strong> ${s.value}</li>`).join('');
-            
-            // Update Chart
-            initChart(data);
-        }
+        // Update UI
+        document.getElementById('topProduct').innerText = data.topProduct;
+        document.getElementById('topScore').innerText = data.topProductValue;
+        document.getElementById('thisYear').innerText = `$${data.thisYear.toLocaleString()}`;
+        document.getElementById('lastYear').innerText = `$${data.lastYear.toLocaleString()}`;
 
-        async function saveStat() {
-            const label = document.getElementById('label').value;
-            const value = document.getElementById('value').value;
-            
-            if(!label || !value) return alert("Please fill both fields");
+        // Populate Table
+        const table = document.getElementById('transactionBody');
+        data.transactions.forEach(t => {
+            const row = `<tr>
+                <td>${t.id}</td>
+                <td><img src="${t.image}" class="user-img">${t.name}</td>
+                <td>${t.date}</td>
+                <td>$${t.amount.toFixed(2)}</td>
+            </tr>`;
+            table.innerHTML += row;
+        });
 
-            await fetch('/api/stats', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ label, value })
-            });
+        // Initialize Charts
+        initCharts(data.salesReport);
+    }
 
-            document.getElementById('label').value = '';
-            document.getElementById('value').value = '';
-            loadDashboard();
-        }
+    function initCharts(salesData) {
+        new Chart(document.getElementById('pieChart'), {
+            type: 'doughnut',
+            data: {
+                labels: ['Desktop', 'Tablet', 'Mobile'],
+                datasets: [{
+                    data: [salesData.desktop, salesData.tablet, salesData.mobile],
+                    backgroundColor: ['#00D1FF', '#FF6384', '#36A2EB']
+                }]
+            },
+            options: { cutout: '70%', plugins: { legend: { position: 'bottom' } } }
+        });
+        
+        // Simple mock Bar Chart
+        new Chart(document.getElementById('barChart'), {
+            type: 'bar',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                datasets: [{ label: 'Sales', data: [12, 19, 3, 5, 2, 3], backgroundColor: '#00D1FF' }]
+            }
+        });
+    }
 
-        loadDashboard();
-    </script>
+    fetchData();
+</script>
 </body>
 </html>
