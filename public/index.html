@@ -18,7 +18,6 @@
         * { box-sizing: border-box; font-family: 'Poppins', sans-serif; }
         body { background: var(--bg); color: var(--text); margin: 0; padding: 10px; }
         
-        /* Mobile First Container */
         .container { max-width: 1300px; margin: auto; padding: 10px; }
         
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 15px; }
@@ -32,38 +31,32 @@
         .card { background: var(--card); padding: 15px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); border: 1px solid var(--border); margin-bottom: 20px; }
         .card h2 { font-size: 1rem; margin-top: 0; border-bottom: 1px solid var(--border); padding-bottom: 10px; color: #e2e8f0; text-transform: uppercase; }
 
-        /* Responsive Totals Grid */
         .totals-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 20px; }
         .total-card { background: linear-gradient(135deg, #1e293b, #0f172a); border: 1px solid var(--border); padding: 15px; border-radius: 15px; text-align: center; }
         .total-card h3 { margin: 0; font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
         .total-card .number { font-size: 1.5rem; font-weight: 700; margin: 5px 0 0 0; color: #fff; }
         
-        /* Form Styling */
         #formWrapper { display: none; }
         .form-group { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 10px; margin-bottom: 20px; }
         label { font-size: 0.75rem; color: var(--text-muted); display: block; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px;}
         input { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--border); background: #0f172a; color: white; outline: none; font-size: 1rem; text-align: center; }
         input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2); }
 
-        /* Network Grid - Mobile Friendly */
         .network-grid { display: grid; gap: 15px; margin-bottom: 20px; }
         .network-row { display: grid; grid-template-columns: 80px 1fr 1fr; gap: 8px; align-items: center; margin-bottom: 8px; }
         .network-header { display: grid; grid-template-columns: 80px 1fr 1fr; gap: 8px; font-weight: bold; font-size: 0.75rem; text-align: center; padding-bottom: 5px; border-bottom: 1px solid var(--border); margin-bottom: 5px;}
         .network-header span:first-child { text-align: left; }
         .network-row label { margin-bottom: 0; font-size: 0.9rem; font-weight: 600; color: #fff; text-transform: uppercase;}
 
-        /* Charts Layout */
         .charts-grid { display: grid; grid-template-columns: 1fr; gap: 20px; }
         .chart-container { position: relative; height: 300px; width: 100%; margin-top: 15px;}
 
-        /* Table */
         .table-responsive { overflow-x: auto; margin-top: 10px; }
         table { width: 100%; border-collapse: collapse; min-width: 900px; text-align: left;}
         th { padding: 10px; font-size: 0.8rem; color: var(--text-muted); border-bottom: 2px solid var(--border); }
         td { padding: 10px; font-size: 0.85rem; border-bottom: 1px solid var(--border); }
         .actions { display: flex; gap: 8px; }
 
-        /* Colors */
         .text-blue { color: #818cf8 !important; }
         .text-green { color: #34d399 !important; }
         .text-purple { color: #c084fc !important; }
@@ -72,7 +65,6 @@
         .text-ooredoo { color: var(--ooredoo) !important; }
         .text-dhiraagu { color: var(--dhiraagu) !important; }
 
-        /* Desktop Adjustments */
         @media (min-width: 900px) {
             body { padding: 20px; }
             .header h1 { font-size: 1.8rem; }
@@ -116,13 +108,14 @@
         <form id="logForm">
             <h2 class="text-blue" style="border: none;">SI TARGETS</h2>
             <div class="form-group">
-                <div><label>SSPS</label><input type="number" id="ssps" class="g1" value="0" min="0"></div>
-                <div><label>SAS</label><input type="number" id="sas" class="g1" value="0" min="0"></div>
-                <div><label>IOSU</label><input type="number" id="g1_region" class="g1" value="0" min="0"></div>
-                <div><label>SES</label><input type="number" id="ses" class="g1" value="0" min="0"></div>
-                <div><label>CIS</label><input type="number" id="cis" class="g1" value="0" min="0"></div>
-                <div><label>IIU</label><input type="number" id="iiu" class="g1" value="0" min="0"></div>
-                <div><label>DAU</label><input type="number" id="dau" class="g1" value="0" min="0"></div>
+                <div><label>SSPS</label><input type="number" id="ssps" class="g1" value="0" min="0" inputmode="numeric"></div>
+                <div><label>SAS</label><input type="number" id="sas" class="g1" value="0" min="0" inputmode="numeric"></div>
+                <div><label>IOSU</label><input type="number" id="g1_region" class="g1" value="0" min="0" inputmode="numeric"></div>
+                <div><label>SES</label><input type="number" id="ses" class="g1" value="0" min="0" inputmode="numeric"></div>
+                <div><label>CIS</label><input type="number" id="cis" class="g1" value="0" min="0" inputmode="numeric"></div>
+                <div><label>IIU</label><input type="number" id="iiu" class="g1" value="0" min="0" inputmode="numeric"></div>
+                <div><label>DAU</label><input type="number" id="dau" class="g1" value="0" min="0" inputmode="numeric"></div>
+                <div><label>OATSU</label><input type="number" id="oatsu" class="g1" value="0" min="0" inputmode="numeric"></div>
             </div>
 
             <hr style="border: 1px solid var(--border); margin: 30px 0;">
@@ -134,37 +127,44 @@
                     <span class="text-ooredoo">Ooredoo</span>
                     <span class="text-dhiraagu">Dhiraagu</span>
                 </div>
-                <div class="network-row"><label>SSPS</label><input type="number" id="q_o_ssps" class="q_o" value="0" min="0"><input type="number" id="q_d_ssps" class="q_d" value="0" min="0"></div>
-                <div class="network-row"><label>SAS</label><input type="number" id="q_o_sas" class="q_o" value="0" min="0"><input type="number" id="q_d_sas" class="q_d" value="0" min="0"></div>
-                <div class="network-row"><label>IOSU</label><input type="number" id="q_o_g1_region" class="q_o" value="0" min="0"><input type="number" id="q_d_g1_region" class="q_d" value="0" min="0"></div>
-                <div class="network-row"><label>SES</label><input type="number" id="q_o_ses" class="q_o" value="0" min="0"><input type="number" id="q_d_ses" class="q_d" value="0" min="0"></div>
-                <div class="network-row"><label>CIS</label><input type="number" id="q_o_cis" class="q_o" value="0" min="0"><input type="number" id="q_d_cis" class="q_d" value="0" min="0"></div>
-                <div class="network-row"><label>IIU</label><input type="number" id="q_o_iiu" class="q_o" value="0" min="0"><input type="number" id="q_d_iiu" class="q_d" value="0" min="0"></div>
-                <div class="network-row"><label>DAU</label><input type="number" id="q_o_dau" class="q_o" value="0" min="0"><input type="number" id="q_d_dau" class="q_d" value="0" min="0"></div>
+                <div class="network-row"><label>SSPS</label><input type="number" id="q_o_ssps" class="q_o" value="0" min="0" inputmode="numeric"><input type="number" id="q_d_ssps" class="q_d" value="0" min="0" inputmode="numeric"></div>
+                <div class="network-row"><label>SAS</label><input type="number" id="q_o_sas" class="q_o" value="0" min="0" inputmode="numeric"><input type="number" id="q_d_sas" class="q_d" value="0" min="0" inputmode="numeric"></div>
+                <div class="network-row"><label>IOSU</label><input type="number" id="q_o_g1_region" class="q_o" value="0" min="0" inputmode="numeric"><input type="number" id="q_d_g1_region" class="q_d" value="0" min="0" inputmode="numeric"></div>
+                <div class="network-row"><label>SES</label><input type="number" id="q_o_ses" class="q_o" value="0" min="0" inputmode="numeric"><input type="number" id="q_d_ses" class="q_d" value="0" min="0" inputmode="numeric"></div>
+                <div class="network-row"><label>CIS</label><input type="number" id="q_o_cis" class="q_o" value="0" min="0" inputmode="numeric"><input type="number" id="q_d_cis" class="q_d" value="0" min="0" inputmode="numeric"></div>
+                <div class="network-row"><label>IIU</label><input type="number" id="q_o_iiu" class="q_o" value="0" min="0" inputmode="numeric"><input type="number" id="q_d_iiu" class="q_d" value="0" min="0" inputmode="numeric"></div>
+                <div class="network-row"><label>DAU</label><input type="number" id="q_o_dau" class="q_o" value="0" min="0" inputmode="numeric"><input type="number" id="q_d_dau" class="q_d" value="0" min="0" inputmode="numeric"></div>
+                <div class="network-row"><label>OATSU</label><input type="number" id="q_o_oatsu" class="q_o" value="0" min="0" inputmode="numeric"><input type="number" id="q_d_oatsu" class="q_d" value="0" min="0" inputmode="numeric"></div>
+                
+                <div class="network-header" style="border-top: 1px solid var(--border); border-bottom: none; padding-top: 10px; margin-top: 5px;">
+                    <span>TOTAL</span>
+                    <span class="text-ooredoo" style="font-size: 1rem;" id="form_qo_total">0</span>
+                    <span class="text-dhiraagu" style="font-size: 1rem;" id="form_qd_total">0</span>
+                </div>
             </div>
 
             <hr style="border: 1px solid var(--border); margin: 30px 0;">
 
             <h2 class="text-green" style="border: none;">LCE2026 MONITORING</h2>
             <div class="form-group">
-                <div><label>REGION</label><input type="number" id="g2_region" class="g2" value="0" min="0"></div>
-                <div><label>MALE</label><input type="number" id="male_area" class="g2" value="0" min="0"></div>
-                <div><label>SI</label><input type="number" id="si" class="g2" value="0" min="0"></div>
-                <div><label>CI</label><input type="number" id="ci" class="g2" value="0" min="0"></div>
-                <div><label>Ct</label><input type="number" id="ct" class="g2" value="0" min="0"></div>
-                <div><label>CNI</label><input type="number" id="cni" class="g2" value="0" min="0"></div>
+                <div><label>REGION</label><input type="number" id="g2_region" class="g2" value="0" min="0" inputmode="numeric"></div>
+                <div><label>MALE</label><input type="number" id="male_area" class="g2" value="0" min="0" inputmode="numeric"></div>
+                <div><label>SI</label><input type="number" id="si" class="g2" value="0" min="0" inputmode="numeric"></div>
+                <div><label>CI</label><input type="number" id="ci" class="g2" value="0" min="0" inputmode="numeric"></div>
+                <div><label>Ct</label><input type="number" id="ct" class="g2" value="0" min="0" inputmode="numeric"></div>
+                <div><label>CNI</label><input type="number" id="cni" class="g2" value="0" min="0" inputmode="numeric"></div>
             </div>
 
             <hr style="border: 1px solid var(--border); margin: 30px 0;">
 
             <h2 class="text-orange" style="border: none;">Reports Data</h2>
             <div class="form-group">
-                <div><label>Daily Reports</label><input type="number" id="daily_reports" class="g3" value="0" min="0"></div>
-                <div><label>Weekly Reports</label><input type="number" id="weekly_reports" class="g3" value="0" min="0"></div>
+                <div><label>Daily Reports</label><input type="number" id="daily_reports" class="g3" value="0" min="0" inputmode="numeric"></div>
+                <div><label>Weekly Reports</label><input type="number" id="weekly_reports" class="g3" value="0" min="0" inputmode="numeric"></div>
             </div>
 
             <div style="text-align: right; margin-top: 15px; color: var(--text-muted); font-size: 0.9rem;">
-                Subtotals &rarr; SI: <b id="sub_t1" class="text-blue">0</b> | Election: <b id="sub_t2" class="text-green">0</b> | Reports: <b id="sub_t3" class="text-orange">0</b> | Quotas: <span class="text-ooredoo">Ooredoo (<b id="sub_qo">0</b>)</span> + <span class="text-dhiraagu">Dhiraagu (<b id="sub_qd">0</b>)</span>
+                Subtotals &rarr; SI: <b id="sub_t1" class="text-blue">0</b> | Election: <b id="sub_t2" class="text-green">0</b> | Reports: <b id="sub_t3" class="text-orange">0</b>
             </div>
 
             <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 20px; padding: 15px; font-size: 1.1rem;" id="submitBtn">SAVE DATA</button>
@@ -172,7 +172,6 @@
     </div>
 
     <div class="charts-grid">
-        
         <div class="card">
             <h2>SI REGULAR MONITORING</h2>
             <div class="chart-container"><canvas id="barChart"></canvas></div>
@@ -199,7 +198,7 @@
         </div>
 
         <div class="card full-width">
-            <h2>Reports Submitted (Daily & Weekly amounts)</h2>
+            <h2>Reports Submitted (Daily & Weekly)</h2>
             <div class="chart-container" style="height: 250px;"><canvas id="reportsChart"></canvas></div>
         </div>
     </div>
@@ -259,9 +258,8 @@
         document.getElementById('sub_t1').innerText = t1;
         document.getElementById('sub_t2').innerText = t2;
         document.getElementById('sub_t3').innerText = t3;
-        document.getElementById('sub_qo').innerText = qo;
-        document.getElementById('sub_qd').innerText = qd;
-        return { t1, t2, t3, qo, qd };
+        document.getElementById('form_qo_total').innerText = qo;
+        document.getElementById('form_qd_total').innerText = qd;
     };
 
     document.querySelectorAll('input').forEach(i => {
@@ -276,35 +274,30 @@
             if(!res.ok) throw new Error('Network error');
             data = await res.json();
         } catch (error) {
-            console.warn("Backend API not reachable. Using fallback demo data to render charts...");
-            // DUMMY DATA FALLBACK: So you can see the charts even if the server is offline
+            console.warn("Backend API not reachable. Using fallback demo data...");
             data = {
                 logs: [
-                    { id: 1, date: "2026-04-10", total1: 20, total2: 15, q_o_total: 150, q_d_total: 100, total3: 5, q_o_ssps: 20, q_d_ssps: 10, q_o_sas: 30, q_d_sas: 20, q_o_g1_region: 40, q_d_g1_region: 30, q_o_ses: 10, q_d_ses: 10, q_o_cis: 20, q_d_cis: 15, q_o_iiu: 15, q_d_iiu: 5, q_o_dau: 15, q_d_dau: 10, daily_reports: 3, weekly_reports: 2 },
-                    { id: 2, date: "2026-04-15", total1: 35, total2: 25, q_o_total: 220, q_d_total: 180, total3: 8, q_o_ssps: 30, q_d_ssps: 20, q_o_sas: 40, q_d_sas: 30, q_o_g1_region: 50, q_d_g1_region: 50, q_o_ses: 20, q_d_ses: 15, q_o_cis: 30, q_d_cis: 20, q_o_iiu: 25, q_d_iiu: 20, q_o_dau: 25, q_d_dau: 25, daily_reports: 5, weekly_reports: 3 }
+                    { id: 1, date: "2026-04-10", total1: 25, total2: 15, q_o_total: 160, q_d_total: 110, total3: 5, oatsu: 5, q_o_oatsu: 10, q_d_oatsu: 10, q_o_ssps: 20, q_d_ssps: 10, q_o_sas: 30, q_d_sas: 20, q_o_g1_region: 40, q_d_g1_region: 30, q_o_ses: 10, q_d_ses: 10, q_o_cis: 20, q_d_cis: 15, q_o_iiu: 15, q_d_iiu: 5, q_o_dau: 15, q_d_dau: 10, daily_reports: 3, weekly_reports: 2 }
                 ],
                 aggregates: {
-                    grandTotal: 125,
-                    g1: { total: 55, ssps: 10, sas: 15, region: 12, ses: 5, cis: 6, iiu: 4, dau: 3 },
+                    grandTotal: 45,
+                    g1: { total: 25, ssps: 10, sas: 15, region: 12, ses: 5, cis: 6, iiu: 4, dau: 3, oatsu: 5 },
                     g2: { total: 40, region: 10, male: 15, si: 5, ci: 4, ct: 3, cni: 3 },
-                    quota: { total: 30, ooredoo: 370, dhiraagu: 280 }
+                    quota: { total: 270, ooredoo: 160, dhiraagu: 110 }
                 }
             };
         }
 
         globalLogs = data.logs;
         
-        // Populate Top Grand Totals
         document.getElementById('dash_grand').innerText = data.aggregates.grandTotal || 0;
         document.getElementById('dash_t1').innerText = data.aggregates.g1.total || 0;
         document.getElementById('dash_t2').innerText = data.aggregates.g2.total || 0;
         document.getElementById('dash_quota').innerText = data.aggregates.quota.total || 0;
         
-        // Populate Network Specific Totals
         document.getElementById('dash_ooredoo').innerText = data.aggregates.quota.ooredoo || 0;
         document.getElementById('dash_dhiraagu').innerText = data.aggregates.quota.dhiraagu || 0;
 
-        // Populate Table
         document.getElementById('historyBody').innerHTML = globalLogs.map(log => `
             <tr>
                 <td>${log.date}</td>
@@ -323,38 +316,33 @@
         const chartLogs = [...globalLogs].reverse(); 
         const dates = chartLogs.map(l => l.date);
 
-        // Calculate Regional Totals for Network Quotas dynamically exactly like your original script
-        let q_o = { ssps: 0, sas: 0, region: 0, ses: 0, cis: 0, iiu: 0, dau: 0 };
-        let q_d = { ssps: 0, sas: 0, region: 0, ses: 0, cis: 0, iiu: 0, dau: 0 };
+        let q_o = { ssps: 0, sas: 0, region: 0, ses: 0, cis: 0, iiu: 0, dau: 0, oatsu: 0 };
+        let q_d = { ssps: 0, sas: 0, region: 0, ses: 0, cis: 0, iiu: 0, dau: 0, oatsu: 0 };
 
         globalLogs.forEach(log => {
             q_o.ssps += log.q_o_ssps || 0; q_o.sas += log.q_o_sas || 0; q_o.region += log.q_o_g1_region || 0;
-            q_o.ses += log.q_o_ses || 0; q_o.cis += log.q_o_cis || 0; q_o.iiu += log.q_o_iiu || 0; q_o.dau += log.q_o_dau || 0;
+            q_o.ses += log.q_o_ses || 0; q_o.cis += log.q_o_cis || 0; q_o.iiu += log.q_o_iiu || 0; q_o.dau += log.q_o_dau || 0; q_o.oatsu += log.q_o_oatsu || 0;
             
             q_d.ssps += log.q_d_ssps || 0; q_d.sas += log.q_d_sas || 0; q_d.region += log.q_d_g1_region || 0;
-            q_d.ses += log.q_d_ses || 0; q_d.cis += log.q_d_cis || 0; q_d.iiu += log.q_d_iiu || 0; q_d.dau += log.q_d_dau || 0;
+            q_d.ses += log.q_d_ses || 0; q_d.cis += log.q_d_cis || 0; q_d.iiu += log.q_d_iiu || 0; q_d.dau += log.q_d_dau || 0; q_d.oatsu += log.q_d_oatsu || 0;
         });
 
-        // 1. Detailed Network Quota Bar Chart
         if(charts.networkQuota) charts.networkQuota.destroy();
         charts.networkQuota = new Chart(document.getElementById('networkQuotaChart'), {
             type: 'bar',
             data: { 
-                labels: ['Ssps', 'SAS', 'IOSU', 'Ses', 'Cis', 'IIU', 'DAU'], 
+                labels: ['Ssps', 'SAS', 'IOSU', 'Ses', 'Cis', 'IIU', 'DAU', 'OATSU'], 
                 datasets: [
-                    { label: 'Ooredoo Allocation', data: [q_o.ssps, q_o.sas, q_o.region, q_o.ses, q_o.cis, q_o.iiu, q_o.dau], backgroundColor: '#ef4444', borderRadius: 4 },
-                    { label: 'Dhiraagu Allocation', data: [q_d.ssps, q_d.sas, q_d.region, q_d.ses, q_d.cis, q_d.iiu, q_d.dau], backgroundColor: '#f97316', borderRadius: 4 }
+                    { label: 'Ooredoo Allocation', data: [q_o.ssps, q_o.sas, q_o.region, q_o.ses, q_o.cis, q_o.iiu, q_o.dau, q_o.oatsu], backgroundColor: '#ef4444', borderRadius: 4 },
+                    { label: 'Dhiraagu Allocation', data: [q_d.ssps, q_d.sas, q_d.region, q_d.ses, q_d.cis, q_d.iiu, q_d.dau, q_d.oatsu], backgroundColor: '#f97316', borderRadius: 4 }
                 ]
             },
             options: { 
                 responsive: true, maintainAspectRatio: false, 
-                plugins: { 
-                    datalabels: { anchor: 'end', align: 'top', color: '#fff', formatter: (value) => value > 0 ? value : '' } 
-                }
+                plugins: { datalabels: { anchor: 'end', align: 'top', color: '#fff', formatter: (value) => value > 0 ? value : '' } }
             }
         });
 
-        // 2. Reports Bar Chart
         if(charts.reports) charts.reports.destroy();
         charts.reports = new Chart(document.getElementById('reportsChart'), {
             type: 'bar',
@@ -365,19 +353,17 @@
             options: { responsive: true, maintainAspectRatio: false, plugins: { datalabels: { anchor: 'end', align: 'bottom' } } }
         });
 
-        // 3. SI Breakdown Bar
         if(charts.bar) charts.bar.destroy();
         charts.bar = new Chart(document.getElementById('barChart'), {
             type: 'bar',
-            data: { labels: ['Ssps', 'SAS', 'IOSU', 'Ses', 'Cis', 'IIU', 'DAU'], datasets: [{
+            data: { labels: ['Ssps', 'SAS', 'IOSU', 'Ses', 'Cis', 'IIU', 'DAU', 'OATSU'], datasets: [{
                 label: 'Total Accumulated', 
-                data: [data.aggregates.g1.ssps, data.aggregates.g1.sas, data.aggregates.g1.region, data.aggregates.g1.ses, data.aggregates.g1.cis, data.aggregates.g1.iiu, data.aggregates.g1.dau],
+                data: [data.aggregates.g1.ssps, data.aggregates.g1.sas, data.aggregates.g1.region, data.aggregates.g1.ses, data.aggregates.g1.cis, data.aggregates.g1.iiu, data.aggregates.g1.dau, data.aggregates.g1.oatsu],
                 backgroundColor: '#818cf8', borderRadius: 4
             }]},
             options: { responsive: true, maintainAspectRatio: false, plugins: { datalabels: { anchor: 'end', align: 'bottom' } } }
         });
 
-        // 4. Election Doughnut
         if(charts.doughnut) charts.doughnut.destroy();
         charts.doughnut = new Chart(document.getElementById('doughnutChart'), {
             type: 'doughnut',
@@ -385,19 +371,31 @@
                 data: [data.aggregates.g2.region, data.aggregates.g2.male, data.aggregates.g2.si, data.aggregates.g2.ci, data.aggregates.g2.ct, data.aggregates.g2.cni],
                 backgroundColor: ['#10b981', '#34d399', '#059669', '#047857', '#065f46', '#a7f3d0'], borderWidth: 0
             }]},
-            options: { responsive: true, maintainAspectRatio: false, cutout: '65%', plugins: { datalabels: { formatter: (value) => value > 0 ? value : '', color: '#fff' } } }
+            options: { 
+                responsive: true, maintainAspectRatio: false, cutout: '65%', 
+                plugins: { 
+                    datalabels: { 
+                        formatter: (value, ctx) => {
+                            let sum = ctx.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
+                            if (sum === 0 || value === 0) return '';
+                            return (value * 100 / sum).toFixed(1) + "%";
+                        }, 
+                        color: '#fff' 
+                    } 
+                } 
+            }
         });
     }
 
     document.getElementById('logForm').onsubmit = async (e) => {
         e.preventDefault();
         const payload = {
-            ssps: Number(document.getElementById('ssps').value), sas: Number(document.getElementById('sas').value), g1_region: Number(document.getElementById('g1_region').value), ses: Number(document.getElementById('ses').value), cis: Number(document.getElementById('cis').value), iiu: Number(document.getElementById('iiu').value), dau: Number(document.getElementById('dau').value),
+            ssps: Number(document.getElementById('ssps').value), sas: Number(document.getElementById('sas').value), g1_region: Number(document.getElementById('g1_region').value), ses: Number(document.getElementById('ses').value), cis: Number(document.getElementById('cis').value), iiu: Number(document.getElementById('iiu').value), dau: Number(document.getElementById('dau').value), oatsu: Number(document.getElementById('oatsu').value),
             g2_region: Number(document.getElementById('g2_region').value), male_area: Number(document.getElementById('male_area').value), si: Number(document.getElementById('si').value), ci: Number(document.getElementById('ci').value), ct: Number(document.getElementById('ct').value), cni: Number(document.getElementById('cni').value),
             daily_reports: Number(document.getElementById('daily_reports').value), weekly_reports: Number(document.getElementById('weekly_reports').value),
             
-            q_o_ssps: Number(document.getElementById('q_o_ssps').value), q_o_sas: Number(document.getElementById('q_o_sas').value), q_o_g1_region: Number(document.getElementById('q_o_g1_region').value), q_o_ses: Number(document.getElementById('q_o_ses').value), q_o_cis: Number(document.getElementById('q_o_cis').value), q_o_iiu: Number(document.getElementById('q_o_iiu').value), q_o_dau: Number(document.getElementById('q_o_dau').value),
-            q_d_ssps: Number(document.getElementById('q_d_ssps').value), q_d_sas: Number(document.getElementById('q_d_sas').value), q_d_g1_region: Number(document.getElementById('q_d_g1_region').value), q_d_ses: Number(document.getElementById('q_d_ses').value), q_d_cis: Number(document.getElementById('q_d_cis').value), q_d_iiu: Number(document.getElementById('q_d_iiu').value), q_d_dau: Number(document.getElementById('q_d_dau').value)
+            q_o_ssps: Number(document.getElementById('q_o_ssps').value), q_o_sas: Number(document.getElementById('q_o_sas').value), q_o_g1_region: Number(document.getElementById('q_o_g1_region').value), q_o_ses: Number(document.getElementById('q_o_ses').value), q_o_cis: Number(document.getElementById('q_o_cis').value), q_o_iiu: Number(document.getElementById('q_o_iiu').value), q_o_dau: Number(document.getElementById('q_o_dau').value), q_o_oatsu: Number(document.getElementById('q_o_oatsu').value),
+            q_d_ssps: Number(document.getElementById('q_d_ssps').value), q_d_sas: Number(document.getElementById('q_d_sas').value), q_d_g1_region: Number(document.getElementById('q_d_g1_region').value), q_d_ses: Number(document.getElementById('q_d_ses').value), q_d_cis: Number(document.getElementById('q_d_cis').value), q_d_iiu: Number(document.getElementById('q_d_iiu').value), q_d_dau: Number(document.getElementById('q_d_dau').value), q_d_oatsu: Number(document.getElementById('q_d_oatsu').value)
         };
 
         const method = editingId ? 'PUT' : 'POST';
@@ -424,14 +422,14 @@
         document.getElementById('submitBtn').style.background = 'var(--warning)';
         document.getElementById('submitBtn').style.color = '#000';
 
-        ['ssps','sas','g1_region','ses','cis','iiu','dau','g2_region','male_area','si','ci','ct','cni'].forEach(key => {
+        ['ssps','sas','g1_region','ses','cis','iiu','dau','oatsu','g2_region','male_area','si','ci','ct','cni'].forEach(key => {
             document.getElementById(key).value = log[key] || 0;
         });
         
-        ['q_o_ssps','q_o_sas','q_o_g1_region','q_o_ses','q_o_cis','q_o_iiu','q_o_dau'].forEach(key => {
+        ['q_o_ssps','q_o_sas','q_o_g1_region','q_o_ses','q_o_cis','q_o_iiu','q_o_dau','q_o_oatsu'].forEach(key => {
             document.getElementById(key).value = log[key] || 0;
         });
-        ['q_d_ssps','q_d_sas','q_d_g1_region','q_d_ses','q_d_cis','q_d_iiu','q_d_dau'].forEach(key => {
+        ['q_d_ssps','q_d_sas','q_d_g1_region','q_d_ses','q_d_cis','q_d_iiu','q_d_dau','q_d_oatsu'].forEach(key => {
             document.getElementById(key).value = log[key] || 0;
         });
         
@@ -457,7 +455,6 @@
         calculateSubTotals();
     }
 
-    // Load initial data
     refreshData();
 </script>
 </body>
