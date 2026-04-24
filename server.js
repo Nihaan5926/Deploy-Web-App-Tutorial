@@ -16,6 +16,7 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static('public'));
 
+// --- Database Schema Setup ---
 db.exec(`
   CREATE TABLE IF NOT EXISTS logs (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -32,11 +33,11 @@ db.exec(`
     
     q_o_ssps INTEGER DEFAULT 0, q_o_sas INTEGER DEFAULT 0, q_o_g1_region INTEGER DEFAULT 0,
     q_o_ses INTEGER DEFAULT 0, q_o_cis INTEGER DEFAULT 0, q_o_iiu INTEGER DEFAULT 0,
-    q_o_dau INTEGER DEFAULT 0, q_o_oatsu INTEGER DEFAULT 0, q_o_total INTEGER DEFAULT 0,
+    q_o_dau INTEGER DEFAULT 0, q_o_oatsu INTEGER DEFAULT 0, q_o_dibg INTEGER DEFAULT 0, q_o_total INTEGER DEFAULT 0,
     
     q_d_ssps INTEGER DEFAULT 0, q_d_sas INTEGER DEFAULT 0, q_d_g1_region INTEGER DEFAULT 0,
     q_d_ses INTEGER DEFAULT 0, q_d_cis INTEGER DEFAULT 0, q_d_iiu INTEGER DEFAULT 0,
-    q_d_dau INTEGER DEFAULT 0, q_d_oatsu INTEGER DEFAULT 0, q_d_total INTEGER DEFAULT 0,
+    q_d_dau INTEGER DEFAULT 0, q_d_oatsu INTEGER DEFAULT 0, q_d_dibg INTEGER DEFAULT 0, q_d_total INTEGER DEFAULT 0,
     
     total_quota INTEGER DEFAULT 0
   );
@@ -44,36 +45,39 @@ db.exec(`
 
 db.exec(`CREATE INDEX IF NOT EXISTS idx_logs_timestamp ON logs(timestamp);`);
 
+// --- Auto-Migration for Old Databases ---
 const tableInfo = db.prepare("PRAGMA table_info(logs)").all();
 const hasDualNetwork = tableInfo.some(col => col.name === 'q_o_ssps');
 const hasOatsu = tableInfo.some(col => col.name === 'oatsu');
+const hasDiBg = tableInfo.some(col => col.name === 'q_o_dibg');
 
 if (!hasDualNetwork) {
   db.exec(`
-    ALTER TABLE logs ADD COLUMN daily_reports INTEGER DEFAULT 0;
-    ALTER TABLE logs ADD COLUMN weekly_reports INTEGER DEFAULT 0;
-    ALTER TABLE logs ADD COLUMN total3 INTEGER DEFAULT 0;
+    ALTER TABLE logs ADD COLUMN daily_reports INTEGER DEFAULT 0; ALTER TABLE logs ADD COLUMN weekly_reports INTEGER DEFAULT 0; ALTER TABLE logs ADD COLUMN total3 INTEGER DEFAULT 0;
     ALTER TABLE logs ADD COLUMN q_o_ssps INTEGER DEFAULT 0; ALTER TABLE logs ADD COLUMN q_o_sas INTEGER DEFAULT 0; ALTER TABLE logs ADD COLUMN q_o_g1_region INTEGER DEFAULT 0; ALTER TABLE logs ADD COLUMN q_o_ses INTEGER DEFAULT 0; ALTER TABLE logs ADD COLUMN q_o_cis INTEGER DEFAULT 0; ALTER TABLE logs ADD COLUMN q_o_iiu INTEGER DEFAULT 0; ALTER TABLE logs ADD COLUMN q_o_dau INTEGER DEFAULT 0; ALTER TABLE logs ADD COLUMN q_o_total INTEGER DEFAULT 0;
-    ALTER TABLE logs ADD COLUMN q_d_ssps INTEGER DEFAULT 0; ALTER TABLE logs ADD COLUMN q_d_sas INTEGER DEFAULT 0; ALTER TABLE logs ADD COLUMN q_d_g1_region INTEGER DEFAULT 0; ALTER TABLE logs ADD COLUMN q_d_ses INTEGER DEFAULT 0; ALTER TABLE logs ADD COLUMN q_d_cis INTEGER DEFAULT 0; ALTER TABLE logs ADD COLUMN q_d_iiu INTEGER DEFAULT 0; ALTER TABLE logs ADD COLUMN q_d_dau INTEGER DEFAULT 0; ALTER TABLE logs ADD COLUMN q_d_total INTEGER DEFAULT 0;
+    ALTER TABLE logs ADD COLUMN q_d_ssps INTEGER DEFAULT 0; ALTER TABLE logs ADD COLUMN q_d_sas INTEGER DEFAULT 0; ALTER TABLE TABLE logs ADD COLUMN q_d_g1_region INTEGER DEFAULT 0; ALTER TABLE logs ADD COLUMN q_d_ses INTEGER DEFAULT 0; ALTER TABLE logs ADD COLUMN q_d_cis INTEGER DEFAULT 0; ALTER TABLE logs ADD COLUMN q_d_iiu INTEGER DEFAULT 0; ALTER TABLE logs ADD COLUMN q_d_dau INTEGER DEFAULT 0; ALTER TABLE logs ADD COLUMN q_d_total INTEGER DEFAULT 0;
     ALTER TABLE logs ADD COLUMN total_quota INTEGER DEFAULT 0;
   `);
 }
 
 if (!hasOatsu) {
-  db.exec(`
-    ALTER TABLE logs ADD COLUMN oatsu INTEGER DEFAULT 0;
-    ALTER TABLE logs ADD COLUMN q_o_oatsu INTEGER DEFAULT 0;
-    ALTER TABLE logs ADD COLUMN q_d_oatsu INTEGER DEFAULT 0;
-  `);
+  db.exec(`ALTER TABLE logs ADD COLUMN oatsu INTEGER DEFAULT 0; ALTER TABLE logs ADD COLUMN q_o_oatsu INTEGER DEFAULT 0; ALTER TABLE logs ADD COLUMN q_d_oatsu INTEGER DEFAULT 0;`);
 }
 
+// NEW: Add DI BG dynamically if it doesn't exist
+if (!hasDiBg) {
+    db.exec(`ALTER TABLE logs ADD COLUMN q_o_dibg INTEGER DEFAULT 0; ALTER TABLE logs ADD COLUMN q_d_dibg INTEGER DEFAULT 0;`);
+}
+
+// --- Centralized Business Logic ---
 const calculateTotals = (d) => {
   const total1 = (d.ssps || 0) + (d.sas || 0) + (d.g1_region || 0) + (d.ses || 0) + (d.cis || 0) + (d.iiu || 0) + (d.dau || 0) + (d.oatsu || 0);
   const total2 = (d.g2_region || 0) + (d.male_area || 0) + (d.si || 0) + (d.ci || 0) + (d.ct || 0) + (d.cni || 0);
   const total3 = (d.daily_reports || 0) + (d.weekly_reports || 0);
   
-  const q_o_total = (d.q_o_ssps || 0) + (d.q_o_sas || 0) + (d.q_o_g1_region || 0) + (d.q_o_ses || 0) + (d.q_o_cis || 0) + (d.q_o_iiu || 0) + (d.q_o_dau || 0) + (d.q_o_oatsu || 0);
-  const q_d_total = (d.q_d_ssps || 0) + (d.q_d_sas || 0) + (d.q_d_g1_region || 0) + (d.q_d_ses || 0) + (d.q_d_cis || 0) + (d.q_d_iiu || 0) + (d.q_d_dau || 0) + (d.q_d_oatsu || 0);
+  // Total Quota calculations now include the DI BG fields
+  const q_o_total = (d.q_o_ssps || 0) + (d.q_o_sas || 0) + (d.q_o_g1_region || 0) + (d.q_o_ses || 0) + (d.q_o_cis || 0) + (d.q_o_iiu || 0) + (d.q_o_dau || 0) + (d.q_o_oatsu || 0) + (d.q_o_dibg || 0);
+  const q_d_total = (d.q_d_ssps || 0) + (d.q_d_sas || 0) + (d.q_d_g1_region || 0) + (d.q_d_ses || 0) + (d.q_d_cis || 0) + (d.q_d_iiu || 0) + (d.q_d_dau || 0) + (d.q_d_oatsu || 0) + (d.q_d_dibg || 0);
   
   return {
     ...d, total1, total2, total3, q_o_total, q_d_total,
@@ -89,7 +93,7 @@ app.get('/api/data', (req, res) => {
       g1: { ssps: 0, sas: 0, region: 0, ses: 0, cis: 0, iiu: 0, dau: 0, oatsu: 0, total: 0 },
       g2: { region: 0, male: 0, si: 0, ci: 0, ct: 0, cni: 0, total: 0 },
       g3: { daily: 0, weekly: 0, total: 0 },
-      quota: { ooredoo: 0, dhiraagu: 0, total: 0 },
+      quota: { ooredoo: 0, dhiraagu: 0, dibg_ooredoo: 0, dibg_dhiraagu: 0, total: 0 }, // Added DIBG containers
       grandTotal: 0
     };
 
@@ -107,6 +111,8 @@ app.get('/api/data', (req, res) => {
       
       aggregates.quota.ooredoo += (log.q_o_total || 0);
       aggregates.quota.dhiraagu += (log.q_d_total || 0);
+      aggregates.quota.dibg_ooredoo += (log.q_o_dibg || 0);  // Track DI BG separated for frontend display
+      aggregates.quota.dibg_dhiraagu += (log.q_d_dibg || 0); // Track DI BG separated for frontend display
       aggregates.quota.total += (log.total_quota || 0);
 
       aggregates.grandTotal += ((log.total1 || 0) + (log.total2 || 0) + (log.total3 || 0));
