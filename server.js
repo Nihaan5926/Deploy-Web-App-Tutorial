@@ -10,14 +10,12 @@ if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true });
 const app = express();
 const db = new Database(path.join(dataDir, 'dashboard.db'));
 
-// --- Performance Improvements ---
-db.pragma('journal_mode = WAL'); // Enables Write-Ahead Logging for better concurrent performance
+db.pragma('journal_mode = WAL'); 
 
 app.use(cors());
 app.use(express.json());
 app.use(express.static('public'));
 
-// --- Robust Database Setup ---
 db.exec(`
   CREATE TABLE IF NOT EXISTS logs (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -44,10 +42,8 @@ db.exec(`
   );
 `);
 
-// Create index for faster sorting by timestamp
 db.exec(`CREATE INDEX IF NOT EXISTS idx_logs_timestamp ON logs(timestamp);`);
 
-// --- Auto-Migration for Old Databases ---
 const tableInfo = db.prepare("PRAGMA table_info(logs)").all();
 const hasDualNetwork = tableInfo.some(col => col.name === 'q_o_ssps');
 const hasOatsu = tableInfo.some(col => col.name === 'oatsu');
@@ -71,7 +67,6 @@ if (!hasOatsu) {
   `);
 }
 
-// --- Centralized Business Logic ---
 const calculateTotals = (d) => {
   const total1 = (d.ssps || 0) + (d.sas || 0) + (d.g1_region || 0) + (d.ses || 0) + (d.cis || 0) + (d.iiu || 0) + (d.dau || 0) + (d.oatsu || 0);
   const total2 = (d.g2_region || 0) + (d.male_area || 0) + (d.si || 0) + (d.ci || 0) + (d.ct || 0) + (d.cni || 0);
@@ -86,7 +81,6 @@ const calculateTotals = (d) => {
   };
 };
 
-// --- API Endpoints ---
 app.get('/api/data', (req, res) => {
   try {
     const logs = db.prepare('SELECT * FROM logs ORDER BY timestamp DESC').all();
@@ -126,21 +120,13 @@ app.get('/api/data', (req, res) => {
 
 app.post('/api/logs', (req, res) => {
   try {
-    const dataWithTotals = calculateTotals({
-      ...req.body,
-      date: new Date().toISOString().split('T')[0]
-    });
-
-    // Using Named Parameters for a much cleaner query
+    const dataWithTotals = calculateTotals({ ...req.body, date: new Date().toISOString().split('T')[0] });
     const columns = Object.keys(dataWithTotals).join(', ');
     const placeholders = Object.keys(dataWithTotals).map(k => `@${k}`).join(', ');
-
     const stmt = db.prepare(`INSERT INTO logs (${columns}) VALUES (${placeholders})`);
     const info = stmt.run(dataWithTotals);
-    
     res.json({ id: info.lastInsertRowid });
   } catch (err) {
-    console.error(err);
     res.status(500).json({ error: "Failed to save data" });
   }
 });
@@ -148,17 +134,12 @@ app.post('/api/logs', (req, res) => {
 app.put('/api/logs/:id', (req, res) => {
   try {
     const dataWithTotals = calculateTotals({ ...req.body, id: req.params.id });
-
-    // Exclude 'id' and 'date' from the update string, but keep them in the payload for the WHERE clause
     const updateKeys = Object.keys(dataWithTotals).filter(k => k !== 'id' && k !== 'date');
     const updateString = updateKeys.map(k => `${k}=@${k}`).join(', ');
-
     const stmt = db.prepare(`UPDATE logs SET ${updateString} WHERE id = @id`);
     stmt.run(dataWithTotals);
-    
     res.json({ success: true });
   } catch (err) {
-    console.error(err);
     res.status(500).json({ error: "Failed to update data" });
   }
 });
