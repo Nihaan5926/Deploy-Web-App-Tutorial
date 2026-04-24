@@ -37,7 +37,7 @@
             display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 20px; 
             position: sticky; top: 0; z-index: 100; background: var(--bg); padding: 10px 0;
         }
-        .total-card { background: linear-gradient(135deg, #1e293b, #0f172a); border: 1px solid var(--border); padding: 15px; border-radius: 15px; text-align: center; }
+        .total-card { background: linear-gradient(135deg, #1e293b, #0f172a); border: 1px solid var(--border); padding: 15px; border-radius: 15px; text-align: center; display: flex; flex-direction: column; justify-content: center;}
         .total-card h3 { margin: 0; font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
         .total-card .number { font-size: 1.5rem; font-weight: 700; margin: 5px 0 0 0; color: #fff; }
         
@@ -54,11 +54,9 @@
         .network-header span:first-child { text-align: left; }
         .network-row label { margin-bottom: 0; font-size: 0.9rem; font-weight: 600; color: #fff; text-transform: uppercase;}
 
-        /* Chart Grid Layout Update */
         .charts-grid { display: grid; grid-template-columns: 1fr; gap: 20px; }
         .chart-container { position: relative; height: 300px; width: 100%; margin-top: 15px;}
         
-        /* Mobile Default spans */
         .card-si { grid-column: 1 / -1; }
         .card-geo { grid-column: 1 / -1; }
         .card-tar { grid-column: 1 / -1; }
@@ -75,6 +73,7 @@
         .text-purple { color: #c084fc !important; }
         .text-orange { color: #fb923c !important; }
         .text-cyan { color: #38bdf8 !important; }
+        .text-white { color: #ffffff !important; }
         .text-ooredoo { color: var(--ooredoo) !important; }
         .text-dhiraagu { color: var(--dhiraagu) !important; }
 
@@ -84,8 +83,6 @@
             .totals-grid { grid-template-columns: repeat(4, 1fr); gap: 15px; }
             .total-card .number { font-size: 2.2rem; }
             .card { padding: 25px; }
-            
-            /* Responsive layout for charts */
             .charts-grid { grid-template-columns: repeat(4, 1fr); }
             .card-si { grid-column: span 2; }
             .card-geo { grid-column: span 1; }
@@ -118,6 +115,10 @@
         <div class="total-card">
             <h3>Election Monitor</h3>
             <p class="number text-green" id="dash_t2">0</p>
+        </div>
+        <div class="total-card">
+            <h3>Total Combined Quota</h3>
+            <p class="number text-cyan" id="dash_quota">0</p>
         </div>
     </div>
 
@@ -152,6 +153,12 @@
                 <div class="network-row"><label>IIU</label><input type="number" id="q_o_iiu" class="q_o" value="0" min="0" inputmode="numeric"><input type="number" id="q_d_iiu" class="q_d" value="0" min="0" inputmode="numeric"></div>
                 <div class="network-row"><label>DAU</label><input type="number" id="q_o_dau" class="q_o" value="0" min="0" inputmode="numeric"><input type="number" id="q_d_dau" class="q_d" value="0" min="0" inputmode="numeric"></div>
                 <div class="network-row"><label>OATSU</label><input type="number" id="q_o_oatsu" class="q_o" value="0" min="0" inputmode="numeric"><input type="number" id="q_d_oatsu" class="q_d" value="0" min="0" inputmode="numeric"></div>
+                
+                <div class="network-row" style="border-top: 1px dashed var(--border); margin-top: 5px; padding-top: 10px;">
+                    <label style="color: #818cf8;">DI BG</label>
+                    <input type="number" id="q_o_dibg" class="q_o" value="0" min="0" inputmode="numeric">
+                    <input type="number" id="q_d_dibg" class="q_d" value="0" min="0" inputmode="numeric">
+                </div>
                 
                 <div class="network-header" style="border-top: 1px solid var(--border); border-bottom: none; padding-top: 10px; margin-top: 5px;">
                     <span>TOTAL</span>
@@ -206,20 +213,31 @@
 
         <div class="card card-full">
             <h2>Detailed Quota Allocation by Network</h2>
+            
             <div class="totals-grid" style="position: static; margin-bottom: 20px;">
                 <div class="total-card" style="border-top: 3px solid var(--ooredoo);">
-                    <h3>OOREDOO DAU</h3>
+                    <h3>Total Ooredoo Quota</h3>
                     <p class="number text-ooredoo" id="dash_ooredoo">0</p>
                 </div>
                 <div class="total-card" style="border-top: 3px solid var(--dhiraagu);">
-                    <h3>DHIRAAGU DAU</h3>
+                    <h3>Total Dhiraagu Quota</h3>
                     <p class="number text-dhiraagu" id="dash_dhiraagu">0</p>
                 </div>
-                <div class="total-card">
-                    <h3>TOTAL Quota</h3>
-                   <p class="number text-cyan" id="dash_quota">0</p>
+                
+                <div class="total-card" style="border-top: 3px solid #818cf8; background: #0f172a;">
+                    <h3>DI BG Quota</h3>
+                    <div style="display: flex; justify-content: space-evenly; margin-top: 8px; font-weight: 700; font-size: 1.2rem;">
+                        <span class="text-ooredoo">Ooredoo: <span id="dash_dibg_o">0</span></span>
+                        <span class="text-dhiraagu">Dhiraagu: <span id="dash_dibg_d">0</span></span>
+                    </div>
+                </div>
+
+                <div class="total-card" style="border-top: 3px solid var(--text);">
+                    <h3>Grand Total All Quota</h3>
+                    <p class="number text-white" id="dash_quota_all">0</p>
                 </div>
             </div>
+            
             <div class="chart-container" style="height: 350px;"><canvas id="networkQuotaChart"></canvas></div>
         </div>
 
@@ -256,17 +274,14 @@
     Chart.defaults.borderColor = '#334155';
     Chart.defaults.set('plugins.datalabels', { color: '#ffffff', font: { weight: 'bold', size: 10 } });
 
-    // Custom Plugin to draw text inside the center of Doughnut Charts
     const doughnutCenterText = {
         id: 'doughnutCenterText',
         beforeDraw: function(chart) {
             if (chart.config.type !== 'doughnut') return;
             const { width, height, ctx } = chart;
             ctx.restore();
-            
             const sum = chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
             
-            // Draw Main Number
             const fontSize = (height / 120).toFixed(2);
             ctx.font = `bold ${fontSize}em Poppins`;
             ctx.textBaseline = "middle";
@@ -277,14 +292,12 @@
             const textY = height / 2;
             ctx.fillText(text, textX, textY);
             
-            // Draw "TOTAL" Label below the number
             const labelSize = (fontSize * 0.35).toFixed(2);
             ctx.font = `600 ${labelSize}em Poppins`;
             ctx.fillStyle = "#94a3b8";
             const labelText = "TOTAL";
             const labelX = Math.round((width - ctx.measureText(labelText).width) / 2);
             ctx.fillText(labelText, labelX, textY + (height * 0.12));
-            
             ctx.save();
         }
     };
@@ -341,26 +354,33 @@
             console.warn("Backend API not reachable. Using fallback demo data...");
             data = {
                 logs: [
-                    { id: 1, date: "2026-04-10", total1: 25, total2: 15, q_o_total: 160, q_d_total: 110, total3: 5, oatsu: 5, q_o_oatsu: 10, q_d_oatsu: 10, q_o_ssps: 20, q_d_ssps: 10, q_o_sas: 30, q_d_sas: 20, q_o_g1_region: 40, q_d_g1_region: 30, q_o_ses: 10, q_d_ses: 10, q_o_cis: 20, q_d_cis: 15, q_o_iiu: 15, q_d_iiu: 5, q_o_dau: 15, q_d_dau: 10, daily_reports: 3, weekly_reports: 2 }
+                    { id: 1, date: "2026-04-10", total1: 25, total2: 15, q_o_total: 170, q_d_total: 120, total3: 5, oatsu: 5, q_o_oatsu: 10, q_d_oatsu: 10, q_o_ssps: 20, q_d_ssps: 10, q_o_sas: 30, q_d_sas: 20, q_o_g1_region: 40, q_d_g1_region: 30, q_o_ses: 10, q_d_ses: 10, q_o_cis: 20, q_d_cis: 15, q_o_iiu: 15, q_d_iiu: 5, q_o_dau: 15, q_d_dau: 10, q_o_dibg: 10, q_d_dibg: 10, daily_reports: 3, weekly_reports: 2 }
                 ],
                 aggregates: {
                     grandTotal: 45,
                     g1: { total: 25, ssps: 10, sas: 15, region: 12, ses: 5, cis: 6, iiu: 4, dau: 3, oatsu: 5 },
                     g2: { total: 40, region: 10, male: 15, si: 5, ci: 4, ct: 3, cni: 3 },
-                    quota: { total: 270, ooredoo: 160, dhiraagu: 110 }
+                    quota: { total: 290, ooredoo: 170, dhiraagu: 120, dibg_ooredoo: 10, dibg_dhiraagu: 10 }
                 }
             };
         }
 
         globalLogs = data.logs;
         
+        // Update top navigation totals
         document.getElementById('dash_grand').innerText = data.aggregates.grandTotal || 0;
         document.getElementById('dash_t1').innerText = data.aggregates.g1.total || 0;
         document.getElementById('dash_t2').innerText = data.aggregates.g2.total || 0;
         document.getElementById('dash_quota').innerText = data.aggregates.quota.total || 0;
         
+        // Update Quota section totals
         document.getElementById('dash_ooredoo').innerText = data.aggregates.quota.ooredoo || 0;
         document.getElementById('dash_dhiraagu').innerText = data.aggregates.quota.dhiraagu || 0;
+        
+        // NEW: Update DI BG and Grand Quota display inside the section
+        document.getElementById('dash_dibg_o').innerText = data.aggregates.quota.dibg_ooredoo || 0;
+        document.getElementById('dash_dibg_d').innerText = data.aggregates.quota.dibg_dhiraagu || 0;
+        document.getElementById('dash_quota_all').innerText = data.aggregates.quota.total || 0;
 
         document.getElementById('historyBody').innerHTML = globalLogs.map(log => `
             <tr>
@@ -380,6 +400,7 @@
         const chartLogs = [...globalLogs].reverse(); 
         const dates = chartLogs.map(l => l.date);
 
+        // NOTE: dibg is NOT collected here for the chart dataset, ensuring it remains hidden from the chart visual.
         let q_o = { ssps: 0, sas: 0, region: 0, ses: 0, cis: 0, iiu: 0, dau: 0, oatsu: 0 };
         let q_d = { ssps: 0, sas: 0, region: 0, ses: 0, cis: 0, iiu: 0, dau: 0, oatsu: 0 };
 
@@ -391,7 +412,6 @@
             q_d.ses += log.q_d_ses || 0; q_d.cis += log.q_d_cis || 0; q_d.iiu += log.q_d_iiu || 0; q_d.dau += log.q_d_dau || 0; q_d.oatsu += log.q_d_oatsu || 0;
         });
 
-        // 1. Bar Chart: SI REGULAR MONITORING
         if(charts.bar) charts.bar.destroy();
         charts.bar = new Chart(document.getElementById('barChart'), {
             type: 'bar',
@@ -409,7 +429,6 @@
             }
         });
 
-        // 2. Doughnut Chart: LCE2026 GEOGRAPHIC
         if(charts.doughnutGeo) charts.doughnutGeo.destroy();
         charts.doughnutGeo = new Chart(document.getElementById('doughnutGeoChart'), {
             type: 'doughnut',
@@ -426,7 +445,6 @@
             }
         });
 
-        // 3. Doughnut Chart: LCE2026 TARGETS
         if(charts.doughnutTarget) charts.doughnutTarget.destroy();
         charts.doughnutTarget = new Chart(document.getElementById('doughnutTargetChart'), {
             type: 'doughnut',
@@ -443,7 +461,12 @@
             }
         });
 
-        // 4. Bar Chart: NETWORK QUOTA
+        // 4. Bar Chart: NETWORK QUOTA (Excludes DI BG explicitly)
+        // We calculate the subtitle mathematically so it strictly reflects the charted elements
+        const chartedOoredoo = q_o.ssps + q_o.sas + q_o.region + q_o.ses + q_o.cis + q_o.iiu + q_o.dau + q_o.oatsu;
+        const chartedDhiraagu = q_d.ssps + q_d.sas + q_d.region + q_d.ses + q_d.cis + q_d.iiu + q_d.dau + q_d.oatsu;
+        const chartedTotal = chartedOoredoo + chartedDhiraagu;
+
         if(charts.networkQuota) charts.networkQuota.destroy();
         charts.networkQuota = new Chart(document.getElementById('networkQuotaChart'), {
             type: 'bar',
@@ -458,12 +481,11 @@
                 responsive: true, maintainAspectRatio: false, 
                 plugins: { 
                     datalabels: { anchor: 'end', align: 'top', color: '#fff', formatter: (value) => value > 0 ? value : '' },
-                    subtitle: { display: true, text: `TOTAL QUOTA ALLOCATED: ${data.aggregates.quota.total}`, color: '#fff', font: { size: 14, weight: 'bold', family: 'Poppins' }, padding: { bottom: 10 } }
+                    subtitle: { display: true, text: `TOTAL CHARTED QUOTA: ${chartedTotal}`, color: '#fff', font: { size: 14, weight: 'bold', family: 'Poppins' }, padding: { bottom: 10 } }
                 }
             }
         });
 
-        // 5. Bar Chart: REPORTS
         if(charts.reports) charts.reports.destroy();
         charts.reports = new Chart(document.getElementById('reportsChart'), {
             type: 'bar',
@@ -524,6 +546,7 @@
         document.getElementById('submitBtn').style.background = 'var(--warning)';
         document.getElementById('submitBtn').style.color = '#000';
 
+        // Automatically fills all inputs including the new DI BG fields because of matching IDs
         document.querySelectorAll('input[type="number"]').forEach(input => {
             if (log[input.id] !== undefined) {
                 input.value = log[input.id];
