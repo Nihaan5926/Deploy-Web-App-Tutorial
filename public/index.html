@@ -215,20 +215,28 @@
             <h2>Detailed Quota Allocation by Network</h2>
             
             <div class="totals-grid" style="position: static; margin-bottom: 20px;">
-                <div class="total-card" style="border-top: 3px solid var(--ooredoo);">
-                    <h3>Total Ooredoo Quota</h3>
-                    <p class="number text-ooredoo" id="dash_ooredoo">0</p>
-                </div>
-                <div class="total-card" style="border-top: 3px solid var(--dhiraagu);">
-                    <h3>Total Dhiraagu Quota</h3>
-                    <p class="number text-dhiraagu" id="dash_dhiraagu">0</p>
+                
+                <div class="total-card" style="border-top: 3px solid var(--text-muted); background: #0f172a;">
+                    <h3>Charted Quota (Graph)</h3>
+                    <div style="display: flex; justify-content: space-evenly; margin-top: 8px; font-weight: 700; font-size: 1.1rem;">
+                        <span class="text-ooredoo">Ooredoo: <span id="dash_charted_o">0</span></span>
+                        <span class="text-dhiraagu">Dhiraagu: <span id="dash_charted_d">0</span></span>
+                    </div>
                 </div>
                 
                 <div class="total-card" style="border-top: 3px solid #818cf8; background: #0f172a;">
                     <h3>DI BG Quota</h3>
-                    <div style="display: flex; justify-content: space-evenly; margin-top: 8px; font-weight: 700; font-size: 1.2rem;">
+                    <div style="display: flex; justify-content: space-evenly; margin-top: 8px; font-weight: 700; font-size: 1.1rem;">
                         <span class="text-ooredoo">Ooredoo: <span id="dash_dibg_o">0</span></span>
                         <span class="text-dhiraagu">Dhiraagu: <span id="dash_dibg_d">0</span></span>
+                    </div>
+                </div>
+                
+                <div class="total-card" style="border-top: 3px solid var(--secondary); background: #0f172a;">
+                    <h3>Department Total</h3>
+                    <div style="display: flex; justify-content: space-evenly; margin-top: 8px; font-weight: 700; font-size: 1.1rem;">
+                        <span class="text-ooredoo">Ooredoo: <span id="dash_dept_o">0</span></span>
+                        <span class="text-dhiraagu">Dhiraagu: <span id="dash_dept_d">0</span></span>
                     </div>
                 </div>
 
@@ -372,15 +380,6 @@
         document.getElementById('dash_t1').innerText = data.aggregates.g1.total || 0;
         document.getElementById('dash_t2').innerText = data.aggregates.g2.total || 0;
         document.getElementById('dash_quota').innerText = data.aggregates.quota.total || 0;
-        
-        // Update Quota section totals
-        document.getElementById('dash_ooredoo').innerText = data.aggregates.quota.ooredoo || 0;
-        document.getElementById('dash_dhiraagu').innerText = data.aggregates.quota.dhiraagu || 0;
-        
-        // NEW: Update DI BG and Grand Quota display inside the section
-        document.getElementById('dash_dibg_o').innerText = data.aggregates.quota.dibg_ooredoo || 0;
-        document.getElementById('dash_dibg_d').innerText = data.aggregates.quota.dibg_dhiraagu || 0;
-        document.getElementById('dash_quota_all').innerText = data.aggregates.quota.total || 0;
 
         document.getElementById('historyBody').innerHTML = globalLogs.map(log => `
             <tr>
@@ -400,7 +399,6 @@
         const chartLogs = [...globalLogs].reverse(); 
         const dates = chartLogs.map(l => l.date);
 
-        // NOTE: dibg is NOT collected here for the chart dataset, ensuring it remains hidden from the chart visual.
         let q_o = { ssps: 0, sas: 0, region: 0, ses: 0, cis: 0, iiu: 0, dau: 0, oatsu: 0 };
         let q_d = { ssps: 0, sas: 0, region: 0, ses: 0, cis: 0, iiu: 0, dau: 0, oatsu: 0 };
 
@@ -412,6 +410,31 @@
             q_d.ses += log.q_d_ses || 0; q_d.cis += log.q_d_cis || 0; q_d.iiu += log.q_d_iiu || 0; q_d.dau += log.q_d_dau || 0; q_d.oatsu += log.q_d_oatsu || 0;
         });
 
+        // --- NEW: Calculate Quota Values for the Split Cards ---
+        const chartedOoredoo = q_o.ssps + q_o.sas + q_o.region + q_o.ses + q_o.cis + q_o.iiu + q_o.dau + q_o.oatsu;
+        const chartedDhiraagu = q_d.ssps + q_d.sas + q_d.region + q_d.ses + q_d.cis + q_d.iiu + q_d.dau + q_d.oatsu;
+        const chartedTotal = chartedOoredoo + chartedDhiraagu;
+
+        const dibgOoredoo = data.aggregates.quota.dibg_ooredoo || 0;
+        const dibgDhiraagu = data.aggregates.quota.dibg_dhiraagu || 0;
+
+        const deptOoredoo = chartedOoredoo + dibgOoredoo;
+        const deptDhiraagu = chartedDhiraagu + dibgDhiraagu;
+
+        // Apply to DOM elements
+        document.getElementById('dash_charted_o').innerText = chartedOoredoo;
+        document.getElementById('dash_charted_d').innerText = chartedDhiraagu;
+        
+        document.getElementById('dash_dibg_o').innerText = dibgOoredoo;
+        document.getElementById('dash_dibg_d').innerText = dibgDhiraagu;
+
+        document.getElementById('dash_dept_o').innerText = deptOoredoo;
+        document.getElementById('dash_dept_d').innerText = deptDhiraagu;
+
+        document.getElementById('dash_quota_all').innerText = data.aggregates.quota.total || 0;
+
+
+        // --- Render Charts ---
         if(charts.bar) charts.bar.destroy();
         charts.bar = new Chart(document.getElementById('barChart'), {
             type: 'bar',
@@ -460,12 +483,6 @@
                 } 
             }
         });
-
-        // 4. Bar Chart: NETWORK QUOTA (Excludes DI BG explicitly)
-        // We calculate the subtitle mathematically so it strictly reflects the charted elements
-        const chartedOoredoo = q_o.ssps + q_o.sas + q_o.region + q_o.ses + q_o.cis + q_o.iiu + q_o.dau + q_o.oatsu;
-        const chartedDhiraagu = q_d.ssps + q_d.sas + q_d.region + q_d.ses + q_d.cis + q_d.iiu + q_d.dau + q_d.oatsu;
-        const chartedTotal = chartedOoredoo + chartedDhiraagu;
 
         if(charts.networkQuota) charts.networkQuota.destroy();
         charts.networkQuota = new Chart(document.getElementById('networkQuotaChart'), {
@@ -546,7 +563,6 @@
         document.getElementById('submitBtn').style.background = 'var(--warning)';
         document.getElementById('submitBtn').style.color = '#000';
 
-        // Automatically fills all inputs including the new DI BG fields because of matching IDs
         document.querySelectorAll('input[type="number"]').forEach(input => {
             if (log[input.id] !== undefined) {
                 input.value = log[input.id];
