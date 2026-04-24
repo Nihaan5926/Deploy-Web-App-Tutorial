@@ -33,7 +33,6 @@
         .card { background: var(--card); padding: 15px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); border: 1px solid var(--border); margin-bottom: 20px; }
         .card h2 { font-size: 1rem; margin-top: 0; border-bottom: 1px solid var(--border); padding-bottom: 10px; color: #e2e8f0; text-transform: uppercase; }
 
-        /* UI Improvement: Sticky Totals Grid */
         .totals-grid { 
             display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 20px; 
             position: sticky; top: 0; z-index: 100; background: var(--bg); padding: 10px 0;
@@ -50,14 +49,20 @@
 
         .network-grid { display: grid; gap: 15px; margin-bottom: 20px; }
         .network-row { display: grid; grid-template-columns: 80px 1fr 1fr; gap: 8px; align-items: center; margin-bottom: 8px; padding: 5px; transition: background 0.2s;}
-        /* UI Improvement: Highlight row on focus */
         .network-row:focus-within { background: rgba(99, 102, 241, 0.05); border-radius: 8px; }
         .network-header { display: grid; grid-template-columns: 80px 1fr 1fr; gap: 8px; font-weight: bold; font-size: 0.75rem; text-align: center; padding-bottom: 5px; border-bottom: 1px solid var(--border); margin-bottom: 5px;}
         .network-header span:first-child { text-align: left; }
         .network-row label { margin-bottom: 0; font-size: 0.9rem; font-weight: 600; color: #fff; text-transform: uppercase;}
 
+        /* Chart Grid Layout Update */
         .charts-grid { display: grid; grid-template-columns: 1fr; gap: 20px; }
         .chart-container { position: relative; height: 300px; width: 100%; margin-top: 15px;}
+        
+        /* Mobile Default spans */
+        .card-si { grid-column: 1 / -1; }
+        .card-geo { grid-column: 1 / -1; }
+        .card-tar { grid-column: 1 / -1; }
+        .card-full { grid-column: 1 / -1; }
 
         .table-responsive { overflow-x: auto; margin-top: 10px; }
         table { width: 100%; border-collapse: collapse; min-width: 900px; text-align: left;}
@@ -79,9 +84,14 @@
             .totals-grid { grid-template-columns: repeat(4, 1fr); gap: 15px; }
             .total-card .number { font-size: 2.2rem; }
             .card { padding: 25px; }
-            .charts-grid { grid-template-columns: 1fr 1fr; }
-            .full-width { grid-column: 1 / -1; }
-            .chart-container { height: 350px; }
+            
+            /* Responsive layout for charts */
+            .charts-grid { grid-template-columns: repeat(4, 1fr); }
+            .card-si { grid-column: span 2; }
+            .card-geo { grid-column: span 1; }
+            .card-tar { grid-column: span 1; }
+            .chart-container { height: 320px; }
+            .card-full .chart-container { height: 350px; }
         }
     </style>
 </head>
@@ -183,17 +193,22 @@
     </div>
 
     <div class="charts-grid">
-        <div class="card">
+        <div class="card card-si">
             <h2>SI REGULAR MONITORING</h2>
             <div class="chart-container"><canvas id="barChart"></canvas></div>
         </div>
         
-        <div class="card">
-            <h2>LCE2026 INTHIHAABU MONITORED TARGETS</h2>
-            <div class="chart-container"><canvas id="doughnutChart"></canvas></div>
+        <div class="card card-geo">
+            <h2>LCE2026 GEOGRAPHIC</h2>
+            <div class="chart-container"><canvas id="doughnutGeoChart"></canvas></div>
         </div>
 
-        <div class="card full-width">
+        <div class="card card-tar">
+            <h2>LCE2026 TARGETS</h2>
+            <div class="chart-container"><canvas id="doughnutTargetChart"></canvas></div>
+        </div>
+
+        <div class="card card-full">
             <h2>Detailed Quota Allocation by Network</h2>
             <div class="totals-grid" style="position: static; margin-bottom: 20px;">
                 <div class="total-card" style="border-top: 3px solid var(--ooredoo);">
@@ -208,7 +223,7 @@
             <div class="chart-container" style="height: 350px;"><canvas id="networkQuotaChart"></canvas></div>
         </div>
 
-        <div class="card full-width">
+        <div class="card card-full">
             <h2>Reports Submitted (Daily & Weekly)</h2>
             <div class="chart-container" style="height: 250px;"><canvas id="reportsChart"></canvas></div>
         </div>
@@ -241,7 +256,40 @@
     Chart.defaults.borderColor = '#334155';
     Chart.defaults.set('plugins.datalabels', { color: '#ffffff', font: { weight: 'bold', size: 10 } });
 
-    // Grab CSS variables to keep charts consistent
+    // Custom Plugin to draw text inside the center of Doughnut Charts
+    const doughnutCenterText = {
+        id: 'doughnutCenterText',
+        beforeDraw: function(chart) {
+            if (chart.config.type !== 'doughnut') return;
+            const { width, height, ctx } = chart;
+            ctx.restore();
+            
+            const sum = chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
+            
+            // Draw Main Number
+            const fontSize = (height / 120).toFixed(2);
+            ctx.font = `bold ${fontSize}em Poppins`;
+            ctx.textBaseline = "middle";
+            ctx.fillStyle = "#ffffff";
+            
+            const text = sum.toString();
+            const textX = Math.round((width - ctx.measureText(text).width) / 2);
+            const textY = height / 2;
+            ctx.fillText(text, textX, textY);
+            
+            // Draw "TOTAL" Label below the number
+            const labelSize = (fontSize * 0.35).toFixed(2);
+            ctx.font = `600 ${labelSize}em Poppins`;
+            ctx.fillStyle = "#94a3b8";
+            const labelText = "TOTAL";
+            const labelX = Math.round((width - ctx.measureText(labelText).width) / 2);
+            ctx.fillText(labelText, labelX, textY + (height * 0.12));
+            
+            ctx.save();
+        }
+    };
+    Chart.register(doughnutCenterText);
+
     const rootStyles = getComputedStyle(document.documentElement);
     const colorOoredoo = rootStyles.getPropertyValue('--ooredoo').trim();
     const colorDhiraagu = rootStyles.getPropertyValue('--dhiraagu').trim();
@@ -343,6 +391,59 @@
             q_d.ses += log.q_d_ses || 0; q_d.cis += log.q_d_cis || 0; q_d.iiu += log.q_d_iiu || 0; q_d.dau += log.q_d_dau || 0; q_d.oatsu += log.q_d_oatsu || 0;
         });
 
+        // 1. Bar Chart: SI REGULAR MONITORING
+        if(charts.bar) charts.bar.destroy();
+        charts.bar = new Chart(document.getElementById('barChart'), {
+            type: 'bar',
+            data: { labels: ['Ssps', 'SAS', 'IOSU', 'Ses', 'Cis', 'IIU', 'DAU', 'OATSU'], datasets: [{
+                label: 'Total Accumulated', 
+                data: [data.aggregates.g1.ssps, data.aggregates.g1.sas, data.aggregates.g1.region, data.aggregates.g1.ses, data.aggregates.g1.cis, data.aggregates.g1.iiu, data.aggregates.g1.dau, data.aggregates.g1.oatsu],
+                backgroundColor: '#818cf8', borderRadius: 4
+            }]},
+            options: { 
+                responsive: true, maintainAspectRatio: false, 
+                plugins: { 
+                    datalabels: { anchor: 'end', align: 'bottom' },
+                    subtitle: { display: true, text: `TOTAL: ${data.aggregates.g1.total}`, color: '#fff', font: { size: 14, weight: 'bold', family: 'Poppins' }, padding: { bottom: 10 } }
+                } 
+            }
+        });
+
+        // 2. Doughnut Chart: LCE2026 GEOGRAPHIC
+        if(charts.doughnutGeo) charts.doughnutGeo.destroy();
+        charts.doughnutGeo = new Chart(document.getElementById('doughnutGeoChart'), {
+            type: 'doughnut',
+            data: { labels: ['REGION', 'Male Area'], datasets: [{
+                data: [data.aggregates.g2.region, data.aggregates.g2.male],
+                backgroundColor: ['#10b981', '#34d399'], borderWidth: 0
+            }]},
+            options: { 
+                responsive: true, maintainAspectRatio: false, cutout: '70%', 
+                plugins: { 
+                    datalabels: { formatter: (value, ctx) => { let sum = ctx.chart.data.datasets[0].data.reduce((a, b) => a + b, 0); if (sum === 0 || value === 0) return ''; return (value * 100 / sum).toFixed(1) + "%"; }, color: '#fff' },
+                    legend: { position: 'bottom' }
+                } 
+            }
+        });
+
+        // 3. Doughnut Chart: LCE2026 TARGETS
+        if(charts.doughnutTarget) charts.doughnutTarget.destroy();
+        charts.doughnutTarget = new Chart(document.getElementById('doughnutTargetChart'), {
+            type: 'doughnut',
+            data: { labels: ['Si', 'CI', 'Ct', 'Cni'], datasets: [{
+                data: [data.aggregates.g2.si, data.aggregates.g2.ci, data.aggregates.g2.ct, data.aggregates.g2.cni],
+                backgroundColor: ['#059669', '#047857', '#065f46', '#a7f3d0'], borderWidth: 0
+            }]},
+            options: { 
+                responsive: true, maintainAspectRatio: false, cutout: '70%', 
+                plugins: { 
+                    datalabels: { formatter: (value, ctx) => { let sum = ctx.chart.data.datasets[0].data.reduce((a, b) => a + b, 0); if (sum === 0 || value === 0) return ''; return (value * 100 / sum).toFixed(1) + "%"; }, color: '#fff' },
+                    legend: { position: 'bottom' }
+                } 
+            }
+        });
+
+        // 4. Bar Chart: NETWORK QUOTA
         if(charts.networkQuota) charts.networkQuota.destroy();
         charts.networkQuota = new Chart(document.getElementById('networkQuotaChart'), {
             type: 'bar',
@@ -355,10 +456,14 @@
             },
             options: { 
                 responsive: true, maintainAspectRatio: false, 
-                plugins: { datalabels: { anchor: 'end', align: 'top', color: '#fff', formatter: (value) => value > 0 ? value : '' } }
+                plugins: { 
+                    datalabels: { anchor: 'end', align: 'top', color: '#fff', formatter: (value) => value > 0 ? value : '' },
+                    subtitle: { display: true, text: `TOTAL QUOTA ALLOCATED: ${data.aggregates.quota.total}`, color: '#fff', font: { size: 14, weight: 'bold', family: 'Poppins' }, padding: { bottom: 10 } }
+                }
             }
         });
 
+        // 5. Bar Chart: REPORTS
         if(charts.reports) charts.reports.destroy();
         charts.reports = new Chart(document.getElementById('reportsChart'), {
             type: 'bar',
@@ -366,44 +471,16 @@
                 { label: 'Daily Reports', data: chartLogs.map(l => l.daily_reports || 0), backgroundColor: '#fb923c', borderRadius: 4 },
                 { label: 'Weekly Reports', data: chartLogs.map(l => l.weekly_reports || 0), backgroundColor: '#fcd34d', borderRadius: 4 }
             ]},
-            options: { responsive: true, maintainAspectRatio: false, plugins: { datalabels: { anchor: 'end', align: 'bottom' } } }
-        });
-
-        if(charts.bar) charts.bar.destroy();
-        charts.bar = new Chart(document.getElementById('barChart'), {
-            type: 'bar',
-            data: { labels: ['Ssps', 'SAS', 'IOSU', 'Ses', 'Cis', 'IIU', 'DAU', 'OATSU'], datasets: [{
-                label: 'Total Accumulated', 
-                data: [data.aggregates.g1.ssps, data.aggregates.g1.sas, data.aggregates.g1.region, data.aggregates.g1.ses, data.aggregates.g1.cis, data.aggregates.g1.iiu, data.aggregates.g1.dau, data.aggregates.g1.oatsu],
-                backgroundColor: '#818cf8', borderRadius: 4
-            }]},
-            options: { responsive: true, maintainAspectRatio: false, plugins: { datalabels: { anchor: 'end', align: 'bottom' } } }
-        });
-
-        if(charts.doughnut) charts.doughnut.destroy();
-        charts.doughnut = new Chart(document.getElementById('doughnutChart'), {
-            type: 'doughnut',
-            data: { labels: ['REGION', 'Male Area', 'Si', 'CI', 'Ct', 'Cni'], datasets: [{
-                data: [data.aggregates.g2.region, data.aggregates.g2.male, data.aggregates.g2.si, data.aggregates.g2.ci, data.aggregates.g2.ct, data.aggregates.g2.cni],
-                backgroundColor: ['#10b981', '#34d399', '#059669', '#047857', '#065f46', '#a7f3d0'], borderWidth: 0
-            }]},
             options: { 
-                responsive: true, maintainAspectRatio: false, cutout: '65%', 
+                responsive: true, maintainAspectRatio: false, 
                 plugins: { 
-                    datalabels: { 
-                        formatter: (value, ctx) => {
-                            let sum = ctx.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
-                            if (sum === 0 || value === 0) return '';
-                            return (value * 100 / sum).toFixed(1) + "%";
-                        }, 
-                        color: '#fff' 
-                    } 
+                    datalabels: { anchor: 'end', align: 'bottom' },
+                    subtitle: { display: true, text: `TOTAL REPORTS SUBMITTED: ${data.aggregates.g3.total}`, color: '#fff', font: { size: 14, weight: 'bold', family: 'Poppins' }, padding: { bottom: 10 } }
                 } 
             }
         });
     }
 
-    // --- Data Extraction Helper ---
     const getValuesByClass = (className) => {
         const data = {};
         document.querySelectorAll(`.${className}`).forEach(input => {
@@ -415,7 +492,6 @@
     document.getElementById('logForm').onsubmit = async (e) => {
         e.preventDefault();
         
-        // Much cleaner payload generation using the helper
         const payload = {
             ...getValuesByClass('g1'),
             ...getValuesByClass('g2'),
@@ -448,7 +524,6 @@
         document.getElementById('submitBtn').style.background = 'var(--warning)';
         document.getElementById('submitBtn').style.color = '#000';
 
-        // Dynamically fill inputs based on their IDs matching DB keys
         document.querySelectorAll('input[type="number"]').forEach(input => {
             if (log[input.id] !== undefined) {
                 input.value = log[input.id];
@@ -474,7 +549,6 @@
         calculateSubTotals();
     }
 
-    // --- Export Feature ---
     function exportCSV() {
         if (!globalLogs || globalLogs.length === 0) return alert("No data to export!");
         const headers = Object.keys(globalLogs[0]).join(',');
