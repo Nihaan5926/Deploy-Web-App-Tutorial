@@ -378,7 +378,10 @@
         // Update top navigation totals
         document.getElementById('dash_grand').innerText = data.aggregates.grandTotal || 0;
         document.getElementById('dash_t1').innerText = data.aggregates.g1.total || 0;
-        document.getElementById('dash_t2').innerText = data.aggregates.g2.total || 0;
+        
+        // UPDATED: Use only LCE2026 GEOGRAPHIC total (Region + Male Area) for the Election Monitor card
+        document.getElementById('dash_t2').innerText = (data.aggregates.g2.region || 0) + (data.aggregates.g2.male || 0);
+        
         document.getElementById('dash_quota').innerText = data.aggregates.quota.total || 0;
 
         document.getElementById('historyBody').innerHTML = globalLogs.map(log => `
@@ -410,7 +413,6 @@
             q_d.ses += log.q_d_ses || 0; q_d.cis += log.q_d_cis || 0; q_d.iiu += log.q_d_iiu || 0; q_d.dau += log.q_d_dau || 0; q_d.oatsu += log.q_d_oatsu || 0;
         });
 
-        // --- NEW: Calculate Quota Values for the Split Cards ---
         const chartedOoredoo = q_o.ssps + q_o.sas + q_o.region + q_o.ses + q_o.cis + q_o.iiu + q_o.dau + q_o.oatsu;
         const chartedDhiraagu = q_d.ssps + q_d.sas + q_d.region + q_d.ses + q_d.cis + q_d.iiu + q_d.dau + q_d.oatsu;
         const chartedTotal = chartedOoredoo + chartedDhiraagu;
@@ -421,7 +423,6 @@
         const deptOoredoo = chartedOoredoo + dibgOoredoo;
         const deptDhiraagu = chartedDhiraagu + dibgDhiraagu;
 
-        // Apply to DOM elements
         document.getElementById('dash_charted_o').innerText = chartedOoredoo;
         document.getElementById('dash_charted_d').innerText = chartedDhiraagu;
         
@@ -433,8 +434,6 @@
 
         document.getElementById('dash_quota_all').innerText = data.aggregates.quota.total || 0;
 
-
-        // --- Render Charts ---
         if(charts.bar) charts.bar.destroy();
         charts.bar = new Chart(document.getElementById('barChart'), {
             type: 'bar',
