@@ -375,13 +375,13 @@
 
         globalLogs = data.logs;
         
-        // Update top navigation totals
-        document.getElementById('dash_grand').innerText = data.aggregates.grandTotal || 0;
-        document.getElementById('dash_t1').innerText = data.aggregates.g1.total || 0;
-        
-        // UPDATED: Use only LCE2026 GEOGRAPHIC total (Region + Male Area) for the Election Monitor card
-        document.getElementById('dash_t2').innerText = (data.aggregates.g2.region || 0) + (data.aggregates.g2.male || 0);
-        
+        // Update top navigation totals dynamically based on SI Targets + Election Monitor
+        const siTargetsTotal = data.aggregates.g1.total || 0;
+        const electionMonitorTotal = (data.aggregates.g2.region || 0) + (data.aggregates.g2.male || 0);
+
+        document.getElementById('dash_grand').innerText = siTargetsTotal + electionMonitorTotal;
+        document.getElementById('dash_t1').innerText = siTargetsTotal;
+        document.getElementById('dash_t2').innerText = electionMonitorTotal;
         document.getElementById('dash_quota').innerText = data.aggregates.quota.total || 0;
 
         document.getElementById('historyBody').innerHTML = globalLogs.map(log => `
