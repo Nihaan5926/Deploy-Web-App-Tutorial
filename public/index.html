@@ -15,59 +15,175 @@
             --border: #334155;
             --ooredoo: #ef4444; --dhiraagu: #f97316;
         }
+        
         * { box-sizing: border-box; font-family: 'Poppins', sans-serif; }
-        body { background: var(--bg); color: var(--text); margin: 0; padding: 10px; }
         
-        .container { max-width: 1300px; margin: auto; padding: 10px; }
-        
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 15px; }
-        .header h1 { margin: 0; font-size: 1.5rem; background: linear-gradient(to right, #818cf8, #c084fc); -webkit-background-clip: text; color: transparent; }
-        .header-actions { display: flex; gap: 10px; }
-        
-        .btn { padding: 10px 20px; border-radius: 8px; border: none; cursor: pointer; font-weight: 600; transition: 0.2s; color: white; }
-        .btn-primary { background: var(--primary); } .btn-primary:hover { background: var(--primary-hover); }
-        .btn-danger { background: var(--accent); padding: 5px 10px; font-size: 0.8rem; }
-        .btn-warning { background: var(--warning); padding: 5px 10px; font-size: 0.8rem; color: #000; }
-        .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text); } .btn-outline:hover { background: var(--border); }
-        
-        .card { background: var(--card); padding: 15px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); border: 1px solid var(--border); margin-bottom: 20px; }
-        .card h2 { font-size: 1rem; margin-top: 0; border-bottom: 1px solid var(--border); padding-bottom: 10px; color: #e2e8f0; text-transform: uppercase; }
-
-        .totals-grid { 
-            display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 20px; 
-            position: sticky; top: 0; z-index: 100; background: var(--bg); padding: 10px 0;
+        body { 
+            background: var(--bg); 
+            color: var(--text); 
+            margin: 0; 
+            padding: 10px; 
+            font-size: 14px;
         }
-        .total-card { background: linear-gradient(135deg, #1e293b, #0f172a); border: 1px solid var(--border); padding: 15px; border-radius: 15px; text-align: center; display: flex; flex-direction: column; justify-content: center;}
-        .total-card h3 { margin: 0; font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
-        .total-card .number { font-size: 1.5rem; font-weight: 700; margin: 5px 0 0 0; color: #fff; }
         
+        .container { 
+            max-width: 1300px; 
+            margin: auto; 
+            padding: 0; 
+        }
+        
+        /* Header */
+        .header { 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+            align-items: center; 
+            margin-bottom: 20px; 
+            gap: 15px; 
+            text-align: center;
+        }
+        
+        .header h1 { 
+            margin: 0; 
+            font-size: 1.5rem; 
+            background: linear-gradient(to right, #818cf8, #c084fc); 
+            -webkit-background-clip: text; 
+            color: transparent; 
+        }
+        
+        .header-actions { 
+            display: flex; 
+            gap: 10px; 
+            width: 100%;
+        }
+        
+        /* Buttons */
+        .btn { 
+            flex: 1;
+            padding: 10px 15px; 
+            border-radius: 8px; 
+            border: none; 
+            cursor: pointer; 
+            font-weight: 600; 
+            transition: 0.2s; 
+            color: white; 
+            text-align: center;
+            font-size: 0.9rem;
+        }
+        .btn-primary { background: var(--primary); } 
+        .btn-primary:hover { background: var(--primary-hover); }
+        .btn-danger { background: var(--accent); padding: 5px 10px; font-size: 0.8rem; flex: none; }
+        .btn-warning { background: var(--warning); padding: 5px 10px; font-size: 0.8rem; color: #000; flex: none; }
+        .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text); } 
+        .btn-outline:hover { background: var(--border); }
+        
+        /* Cards */
+        .card { 
+            background: var(--card); 
+            padding: 15px; 
+            border-radius: 12px; 
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2); 
+            border: 1px solid var(--border); 
+            margin-bottom: 20px; 
+            width: 100%;
+        }
+        .card h2 { 
+            font-size: 1rem; 
+            margin-top: 0; 
+            border-bottom: 1px solid var(--border); 
+            padding-bottom: 10px; 
+            color: #e2e8f0; 
+            text-transform: uppercase; 
+        }
+
+        /* Totals Grid (Sticky) */
+        .totals-grid { 
+            display: grid; 
+            grid-template-columns: repeat(2, 1fr); 
+            gap: 10px; 
+            margin-bottom: 20px; 
+            position: sticky; 
+            top: 0; 
+            z-index: 100; 
+            background: var(--bg); 
+            padding: 10px 0;
+        }
+        .total-card { 
+            background: linear-gradient(135deg, #1e293b, #0f172a); 
+            border: 1px solid var(--border); 
+            padding: 10px; 
+            border-radius: 10px; 
+            text-align: center; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center;
+        }
+        .total-card h3 { margin: 0; font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+        .total-card .number { font-size: 1.2rem; font-weight: 700; margin: 5px 0 0 0; color: #fff; }
+        
+        /* Form */
         #formWrapper { display: none; }
-        .form-group { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 10px; margin-bottom: 20px; }
-        label { font-size: 0.75rem; color: var(--text-muted); display: block; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px;}
-        input { width: 100%; padding: 12px 10px; border-radius: 8px; border: 1px solid var(--border); background: #0f172a; color: white; outline: none; font-size: 1rem; text-align: center; }
+        .form-group { 
+            display: grid; 
+            grid-template-columns: repeat(2, 1fr); 
+            gap: 10px; 
+            margin-bottom: 20px; 
+        }
+        label { 
+            font-size: 0.75rem; 
+            color: var(--text-muted); 
+            display: block; 
+            margin-bottom: 5px; 
+            text-transform: uppercase; 
+            letter-spacing: 0.5px;
+        }
+        input { 
+            width: 100%; 
+            padding: 10px; 
+            border-radius: 8px; 
+            border: 1px solid var(--border); 
+            background: #0f172a; 
+            color: white; 
+            outline: none; 
+            font-size: 0.95rem; 
+            text-align: center; 
+        }
         input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2); }
 
-        .network-grid { display: grid; gap: 15px; margin-bottom: 20px; }
-        .network-row { display: grid; grid-template-columns: 80px 1fr 1fr; gap: 8px; align-items: center; margin-bottom: 8px; padding: 5px; transition: background 0.2s;}
+        /* Network Quota Input Grid */
+        .network-grid { display: grid; gap: 10px; margin-bottom: 20px; }
+        .network-row, .network-header { 
+            display: grid; 
+            grid-template-columns: 60px 1fr 1fr; 
+            gap: 8px; 
+            align-items: center; 
+        }
+        .network-row { margin-bottom: 8px; padding: 5px; transition: background 0.2s; }
         .network-row:focus-within { background: rgba(99, 102, 241, 0.05); border-radius: 8px; }
-        .network-header { display: grid; grid-template-columns: 80px 1fr 1fr; gap: 8px; font-weight: bold; font-size: 0.75rem; text-align: center; padding-bottom: 5px; border-bottom: 1px solid var(--border); margin-bottom: 5px;}
+        .network-header { 
+            font-weight: bold; 
+            font-size: 0.7rem; 
+            text-align: center; 
+            padding-bottom: 5px; 
+            border-bottom: 1px solid var(--border); 
+            margin-bottom: 5px;
+        }
         .network-header span:first-child { text-align: left; }
-        .network-row label { margin-bottom: 0; font-size: 0.9rem; font-weight: 600; color: #fff; text-transform: uppercase;}
+        .network-row label { margin-bottom: 0; font-size: 0.8rem; font-weight: 600; color: #fff; text-transform: uppercase;}
 
-        .charts-grid { display: grid; grid-template-columns: 1fr; gap: 20px; }
-        .chart-container { position: relative; height: 300px; width: 100%; margin-top: 15px;}
-        
-        .card-si { grid-column: 1 / -1; }
-        .card-geo { grid-column: 1 / -1; }
-        .card-tar { grid-column: 1 / -1; }
-        .card-full { grid-column: 1 / -1; }
+        /* Charts */
+        .charts-grid { display: grid; grid-template-columns: 1fr; gap: 15px; }
+        .chart-container { position: relative; height: 250px; width: 100%; margin-top: 15px; }
+        .card-full .chart-container { height: 300px; }
 
-        .table-responsive { overflow-x: auto; margin-top: 10px; }
-        table { width: 100%; border-collapse: collapse; min-width: 900px; text-align: left;}
-        th { padding: 10px; font-size: 0.8rem; color: var(--text-muted); border-bottom: 2px solid var(--border); }
+        /* Table */
+        .table-responsive { overflow-x: auto; margin-top: 10px; border-radius: 8px; }
+        table { width: 100%; border-collapse: collapse; min-width: 800px; text-align: left; }
+        th { padding: 12px 10px; font-size: 0.8rem; color: var(--text-muted); border-bottom: 2px solid var(--border); white-space: nowrap; }
         td { padding: 10px; font-size: 0.85rem; border-bottom: 1px solid var(--border); }
         .actions { display: flex; gap: 8px; }
 
+        /* Utility Colors */
         .text-blue { color: #818cf8 !important; }
         .text-green { color: #34d399 !important; }
         .text-purple { color: #c084fc !important; }
@@ -77,16 +193,47 @@
         .text-ooredoo { color: var(--ooredoo) !important; }
         .text-dhiraagu { color: var(--dhiraagu) !important; }
 
+        /* Tablet Breakpoint */
+        @media (min-width: 600px) {
+            body { padding: 15px; }
+            .header { flex-direction: row; justify-content: space-between; text-align: left; }
+            .header-actions { width: auto; }
+            .btn { flex: none; }
+            
+            .totals-grid { grid-template-columns: repeat(4, 1fr); padding: 15px 0; }
+            .total-card h3 { font-size: 0.7rem; }
+            .total-card .number { font-size: 1.6rem; }
+
+            .form-group { grid-template-columns: repeat(4, 1fr); }
+            .network-row, .network-header { grid-template-columns: 80px 1fr 1fr; gap: 15px; }
+            .network-header { font-size: 0.75rem; }
+            .network-row label { font-size: 0.9rem; }
+            
+            .charts-grid { grid-template-columns: repeat(2, 1fr); }
+            .card-si { grid-column: 1 / -1; }
+            .card-geo { grid-column: span 1; }
+            .card-tar { grid-column: span 1; }
+            .card-full { grid-column: 1 / -1; }
+            .chart-container { height: 300px; }
+        }
+
+        /* Desktop Breakpoint */
         @media (min-width: 900px) {
             body { padding: 20px; }
+            .container { padding: 10px; }
             .header h1 { font-size: 1.8rem; }
-            .totals-grid { grid-template-columns: repeat(4, 1fr); gap: 15px; }
+            
+            .totals-grid { gap: 15px; }
             .total-card .number { font-size: 2.2rem; }
-            .card { padding: 25px; }
-            .charts-grid { grid-template-columns: repeat(4, 1fr); }
+            
+            .card { padding: 25px; border-radius: 15px; }
+            .form-group { grid-template-columns: repeat(8, 1fr); }
+            
+            .charts-grid { grid-template-columns: repeat(4, 1fr); gap: 20px; }
             .card-si { grid-column: span 2; }
             .card-geo { grid-column: span 1; }
             .card-tar { grid-column: span 1; }
+            
             .chart-container { height: 320px; }
             .card-full .chart-container { height: 350px; }
         }
@@ -182,12 +329,12 @@
             <hr style="border: 1px solid var(--border); margin: 30px 0;">
 
             <h2 class="text-orange" style="border: none;">Reports Data</h2>
-            <div class="form-group">
+            <div class="form-group" style="grid-template-columns: repeat(2, 1fr);">
                 <div><label>Daily Reports</label><input type="number" id="daily_reports" class="g3" value="0" min="0" inputmode="numeric"></div>
                 <div><label>Weekly Reports</label><input type="number" id="weekly_reports" class="g3" value="0" min="0" inputmode="numeric"></div>
             </div>
 
-            <div style="text-align: right; margin-top: 15px; color: var(--text-muted); font-size: 0.9rem;">
+            <div style="text-align: right; margin-top: 15px; color: var(--text-muted); font-size: 0.85rem;">
                 Subtotals &rarr; SI: <b id="sub_t1" class="text-blue">0</b> | Election: <b id="sub_t2" class="text-green">0</b> | Reports: <b id="sub_t3" class="text-orange">0</b>
             </div>
 
@@ -246,7 +393,7 @@
                 </div>
             </div>
             
-            <div class="chart-container" style="height: 350px;"><canvas id="networkQuotaChart"></canvas></div>
+            <div class="chart-container"><canvas id="networkQuotaChart"></canvas></div>
         </div>
 
         <div class="card card-full">
