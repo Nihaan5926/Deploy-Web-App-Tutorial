@@ -10,6 +10,9 @@ if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true });
 const app = express();
 const db = new Database(path.join(dataDir, 'dashboard.db'));
 
+// --- Performance Improvements ---
+db.pragma('journal_mode = WAL'); // Enables Write-Ahead Logging for better concurrent performance
+
 app.use(cors());
 app.use(express.json());
 app.use(express.static('public'));
@@ -41,7 +44,10 @@ db.exec(`
   );
 `);
 
-// --- Auto-Migration for Old Databases adding OATSU & Quotas ---
+// Create index for faster sorting by timestamp
+db.exec(`CREATE INDEX IF NOT EXISTS idx_logs_timestamp ON logs(timestamp);`);
+
+// --- Auto-Migration for Old Databases ---
 const tableInfo = db.prepare("PRAGMA table_info(logs)").all();
 const hasDualNetwork = tableInfo.some(col => col.name === 'q_o_ssps');
 const hasOatsu = tableInfo.some(col => col.name === 'oatsu');
@@ -64,6 +70,21 @@ if (!hasOatsu) {
     ALTER TABLE logs ADD COLUMN q_d_oatsu INTEGER DEFAULT 0;
   `);
 }
+
+// --- Centralized Business Logic ---
+const calculateTotals = (d) => {
+  const total1 = (d.ssps || 0) + (d.sas || 0) + (d.g1_region || 0) + (d.ses || 0) + (d.cis || 0) + (d.iiu || 0) + (d.dau || 0) + (d.oatsu || 0);
+  const total2 = (d.g2_region || 0) + (d.male_area || 0) + (d.si || 0) + (d.ci || 0) + (d.ct || 0) + (d.cni || 0);
+  const total3 = (d.daily_reports || 0) + (d.weekly_reports || 0);
+  
+  const q_o_total = (d.q_o_ssps || 0) + (d.q_o_sas || 0) + (d.q_o_g1_region || 0) + (d.q_o_ses || 0) + (d.q_o_cis || 0) + (d.q_o_iiu || 0) + (d.q_o_dau || 0) + (d.q_o_oatsu || 0);
+  const q_d_total = (d.q_d_ssps || 0) + (d.q_d_sas || 0) + (d.q_d_g1_region || 0) + (d.q_d_ses || 0) + (d.q_d_cis || 0) + (d.q_d_iiu || 0) + (d.q_d_dau || 0) + (d.q_d_oatsu || 0);
+  
+  return {
+    ...d, total1, total2, total3, q_o_total, q_d_total,
+    total_quota: q_o_total + q_d_total
+  };
+};
 
 // --- API Endpoints ---
 app.get('/api/data', (req, res) => {
@@ -105,36 +126,18 @@ app.get('/api/data', (req, res) => {
 
 app.post('/api/logs', (req, res) => {
   try {
-    const d = req.body;
-    const date = new Date().toISOString().split('T')[0];
-    
-    const total1 = d.ssps + d.sas + d.g1_region + d.ses + d.cis + d.iiu + d.dau + d.oatsu;
-    const total2 = d.g2_region + d.male_area + d.si + d.ci + d.ct + d.cni;
-    const total3 = d.daily_reports + d.weekly_reports;
-    
-    const q_o_total = d.q_o_ssps + d.q_o_sas + d.q_o_g1_region + d.q_o_ses + d.q_o_cis + d.q_o_iiu + d.q_o_dau + d.q_o_oatsu;
-    const q_d_total = d.q_d_ssps + d.q_d_sas + d.q_d_g1_region + d.q_d_ses + d.q_d_cis + d.q_d_iiu + d.q_d_dau + d.q_d_oatsu;
-    const total_quota = q_o_total + q_d_total;
+    const dataWithTotals = calculateTotals({
+      ...req.body,
+      date: new Date().toISOString().split('T')[0]
+    });
 
-    const stmt = db.prepare(`
-      INSERT INTO logs (
-        date, ssps, sas, g1_region, ses, cis, iiu, dau, oatsu, total1, 
-        g2_region, male_area, si, ci, ct, cni, total2,
-        daily_reports, weekly_reports, total3,
-        q_o_ssps, q_o_sas, q_o_g1_region, q_o_ses, q_o_cis, q_o_iiu, q_o_dau, q_o_oatsu, q_o_total,
-        q_d_ssps, q_d_sas, q_d_g1_region, q_d_ses, q_d_cis, q_d_iiu, q_d_dau, q_d_oatsu, q_d_total,
-        total_quota
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `);
+    // Using Named Parameters for a much cleaner query
+    const columns = Object.keys(dataWithTotals).join(', ');
+    const placeholders = Object.keys(dataWithTotals).map(k => `@${k}`).join(', ');
+
+    const stmt = db.prepare(`INSERT INTO logs (${columns}) VALUES (${placeholders})`);
+    const info = stmt.run(dataWithTotals);
     
-    const info = stmt.run(
-      date, d.ssps, d.sas, d.g1_region, d.ses, d.cis, d.iiu, d.dau, d.oatsu, total1, 
-      d.g2_region, d.male_area, d.si, d.ci, d.ct, d.cni, total2,
-      d.daily_reports, d.weekly_reports, total3,
-      d.q_o_ssps, d.q_o_sas, d.q_o_g1_region, d.q_o_ses, d.q_o_cis, d.q_o_iiu, d.q_o_dau, d.q_o_oatsu, q_o_total,
-      d.q_d_ssps, d.q_d_sas, d.q_d_g1_region, d.q_d_ses, d.q_d_cis, d.q_d_iiu, d.q_d_dau, d.q_d_oatsu, q_d_total,
-      total_quota
-    );
     res.json({ id: info.lastInsertRowid });
   } catch (err) {
     console.error(err);
@@ -144,35 +147,15 @@ app.post('/api/logs', (req, res) => {
 
 app.put('/api/logs/:id', (req, res) => {
   try {
-    const d = req.body;
-    
-    const total1 = d.ssps + d.sas + d.g1_region + d.ses + d.cis + d.iiu + d.dau + d.oatsu;
-    const total2 = d.g2_region + d.male_area + d.si + d.ci + d.ct + d.cni;
-    const total3 = d.daily_reports + d.weekly_reports;
-    
-    const q_o_total = d.q_o_ssps + d.q_o_sas + d.q_o_g1_region + d.q_o_ses + d.q_o_cis + d.q_o_iiu + d.q_o_dau + d.q_o_oatsu;
-    const q_d_total = d.q_d_ssps + d.q_d_sas + d.q_d_g1_region + d.q_d_ses + d.q_d_cis + d.q_d_iiu + d.q_d_dau + d.q_d_oatsu;
-    const total_quota = q_o_total + q_d_total;
+    const dataWithTotals = calculateTotals({ ...req.body, id: req.params.id });
 
-    const stmt = db.prepare(`
-      UPDATE logs SET 
-        ssps=?, sas=?, g1_region=?, ses=?, cis=?, iiu=?, dau=?, oatsu=?, total1=?,
-        g2_region=?, male_area=?, si=?, ci=?, ct=?, cni=?, total2=?,
-        daily_reports=?, weekly_reports=?, total3=?,
-        q_o_ssps=?, q_o_sas=?, q_o_g1_region=?, q_o_ses=?, q_o_cis=?, q_o_iiu=?, q_o_dau=?, q_o_oatsu=?, q_o_total=?,
-        q_d_ssps=?, q_d_sas=?, q_d_g1_region=?, q_d_ses=?, q_d_cis=?, q_d_iiu=?, q_d_dau=?, q_d_oatsu=?, q_d_total=?,
-        total_quota=?
-      WHERE id = ?
-    `);
+    // Exclude 'id' and 'date' from the update string, but keep them in the payload for the WHERE clause
+    const updateKeys = Object.keys(dataWithTotals).filter(k => k !== 'id' && k !== 'date');
+    const updateString = updateKeys.map(k => `${k}=@${k}`).join(', ');
+
+    const stmt = db.prepare(`UPDATE logs SET ${updateString} WHERE id = @id`);
+    stmt.run(dataWithTotals);
     
-    stmt.run(
-      d.ssps, d.sas, d.g1_region, d.ses, d.cis, d.iiu, d.dau, d.oatsu, total1, 
-      d.g2_region, d.male_area, d.si, d.ci, d.ct, d.cni, total2,
-      d.daily_reports, d.weekly_reports, total3,
-      d.q_o_ssps, d.q_o_sas, d.q_o_g1_region, d.q_o_ses, d.q_o_cis, d.q_o_iiu, d.q_o_dau, d.q_o_oatsu, q_o_total,
-      d.q_d_ssps, d.q_d_sas, d.q_d_g1_region, d.q_d_ses, d.q_d_cis, d.q_d_iiu, d.q_d_dau, d.q_d_oatsu, q_d_total,
-      total_quota, req.params.id
-    );
     res.json({ success: true });
   } catch (err) {
     console.error(err);
