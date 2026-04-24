@@ -22,16 +22,22 @@
         
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 15px; }
         .header h1 { margin: 0; font-size: 1.5rem; background: linear-gradient(to right, #818cf8, #c084fc); -webkit-background-clip: text; color: transparent; }
+        .header-actions { display: flex; gap: 10px; }
         
         .btn { padding: 10px 20px; border-radius: 8px; border: none; cursor: pointer; font-weight: 600; transition: 0.2s; color: white; }
         .btn-primary { background: var(--primary); } .btn-primary:hover { background: var(--primary-hover); }
         .btn-danger { background: var(--accent); padding: 5px 10px; font-size: 0.8rem; }
         .btn-warning { background: var(--warning); padding: 5px 10px; font-size: 0.8rem; color: #000; }
+        .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text); } .btn-outline:hover { background: var(--border); }
         
         .card { background: var(--card); padding: 15px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); border: 1px solid var(--border); margin-bottom: 20px; }
         .card h2 { font-size: 1rem; margin-top: 0; border-bottom: 1px solid var(--border); padding-bottom: 10px; color: #e2e8f0; text-transform: uppercase; }
 
-        .totals-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 20px; }
+        /* UI Improvement: Sticky Totals Grid */
+        .totals-grid { 
+            display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 20px; 
+            position: sticky; top: 0; z-index: 100; background: var(--bg); padding: 10px 0;
+        }
         .total-card { background: linear-gradient(135deg, #1e293b, #0f172a); border: 1px solid var(--border); padding: 15px; border-radius: 15px; text-align: center; }
         .total-card h3 { margin: 0; font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
         .total-card .number { font-size: 1.5rem; font-weight: 700; margin: 5px 0 0 0; color: #fff; }
@@ -39,11 +45,13 @@
         #formWrapper { display: none; }
         .form-group { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 10px; margin-bottom: 20px; }
         label { font-size: 0.75rem; color: var(--text-muted); display: block; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px;}
-        input { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--border); background: #0f172a; color: white; outline: none; font-size: 1rem; text-align: center; }
+        input { width: 100%; padding: 12px 10px; border-radius: 8px; border: 1px solid var(--border); background: #0f172a; color: white; outline: none; font-size: 1rem; text-align: center; }
         input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2); }
 
         .network-grid { display: grid; gap: 15px; margin-bottom: 20px; }
-        .network-row { display: grid; grid-template-columns: 80px 1fr 1fr; gap: 8px; align-items: center; margin-bottom: 8px; }
+        .network-row { display: grid; grid-template-columns: 80px 1fr 1fr; gap: 8px; align-items: center; margin-bottom: 8px; padding: 5px; transition: background 0.2s;}
+        /* UI Improvement: Highlight row on focus */
+        .network-row:focus-within { background: rgba(99, 102, 241, 0.05); border-radius: 8px; }
         .network-header { display: grid; grid-template-columns: 80px 1fr 1fr; gap: 8px; font-weight: bold; font-size: 0.75rem; text-align: center; padding-bottom: 5px; border-bottom: 1px solid var(--border); margin-bottom: 5px;}
         .network-header span:first-child { text-align: left; }
         .network-row label { margin-bottom: 0; font-size: 0.9rem; font-weight: 600; color: #fff; text-transform: uppercase;}
@@ -82,7 +90,10 @@
 <div class="container">
     <div class="header">
         <h1>Overview Dashboard</h1>
-        <button class="btn btn-primary" onclick="toggleForm()" id="toggleBtn">+ Data Entry Form</button>
+        <div class="header-actions">
+            <button class="btn btn-outline" onclick="exportCSV()">Download CSV</button>
+            <button class="btn btn-primary" onclick="toggleForm()" id="toggleBtn">+ Data Entry</button>
+        </div>
     </div>
 
     <div class="totals-grid">
@@ -184,7 +195,7 @@
 
         <div class="card full-width">
             <h2>Detailed Quota Allocation by Network</h2>
-            <div class="totals-grid" style="margin-bottom: 20px;">
+            <div class="totals-grid" style="position: static; margin-bottom: 20px;">
                 <div class="total-card" style="border-top: 3px solid var(--ooredoo);">
                     <h3>Total Ooredoo Quota</h3>
                     <p class="number text-ooredoo" id="dash_ooredoo">0</p>
@@ -230,6 +241,11 @@
     Chart.defaults.borderColor = '#334155';
     Chart.defaults.set('plugins.datalabels', { color: '#ffffff', font: { weight: 'bold', size: 10 } });
 
+    // Grab CSS variables to keep charts consistent
+    const rootStyles = getComputedStyle(document.documentElement);
+    const colorOoredoo = rootStyles.getPropertyValue('--ooredoo').trim();
+    const colorDhiraagu = rootStyles.getPropertyValue('--dhiraagu').trim();
+
     let charts = {};
     let globalLogs = [];
     let editingId = null;
@@ -239,7 +255,7 @@
         const btn = document.getElementById('toggleBtn');
         if(fw.style.display === 'block') {
             fw.style.display = 'none';
-            btn.innerText = '+ Data Entry Form';
+            btn.innerText = '+ Data Entry';
             if(!editingId) resetForm(); 
         } else {
             fw.style.display = 'block';
@@ -333,8 +349,8 @@
             data: { 
                 labels: ['Ssps', 'SAS', 'IOSU', 'Ses', 'Cis', 'IIU', 'DAU', 'OATSU'], 
                 datasets: [
-                    { label: 'Ooredoo Allocation', data: [q_o.ssps, q_o.sas, q_o.region, q_o.ses, q_o.cis, q_o.iiu, q_o.dau, q_o.oatsu], backgroundColor: '#ef4444', borderRadius: 4 },
-                    { label: 'Dhiraagu Allocation', data: [q_d.ssps, q_d.sas, q_d.region, q_d.ses, q_d.cis, q_d.iiu, q_d.dau, q_d.oatsu], backgroundColor: '#f97316', borderRadius: 4 }
+                    { label: 'Ooredoo Allocation', data: [q_o.ssps, q_o.sas, q_o.region, q_o.ses, q_o.cis, q_o.iiu, q_o.dau, q_o.oatsu], backgroundColor: colorOoredoo, borderRadius: 4 },
+                    { label: 'Dhiraagu Allocation', data: [q_d.ssps, q_d.sas, q_d.region, q_d.ses, q_d.cis, q_d.iiu, q_d.dau, q_d.oatsu], backgroundColor: colorDhiraagu, borderRadius: 4 }
                 ]
             },
             options: { 
@@ -387,15 +403,25 @@
         });
     }
 
+    // --- Data Extraction Helper ---
+    const getValuesByClass = (className) => {
+        const data = {};
+        document.querySelectorAll(`.${className}`).forEach(input => {
+            data[input.id] = Number(input.value) || 0;
+        });
+        return data;
+    };
+
     document.getElementById('logForm').onsubmit = async (e) => {
         e.preventDefault();
+        
+        // Much cleaner payload generation using the helper
         const payload = {
-            ssps: Number(document.getElementById('ssps').value), sas: Number(document.getElementById('sas').value), g1_region: Number(document.getElementById('g1_region').value), ses: Number(document.getElementById('ses').value), cis: Number(document.getElementById('cis').value), iiu: Number(document.getElementById('iiu').value), dau: Number(document.getElementById('dau').value), oatsu: Number(document.getElementById('oatsu').value),
-            g2_region: Number(document.getElementById('g2_region').value), male_area: Number(document.getElementById('male_area').value), si: Number(document.getElementById('si').value), ci: Number(document.getElementById('ci').value), ct: Number(document.getElementById('ct').value), cni: Number(document.getElementById('cni').value),
-            daily_reports: Number(document.getElementById('daily_reports').value), weekly_reports: Number(document.getElementById('weekly_reports').value),
-            
-            q_o_ssps: Number(document.getElementById('q_o_ssps').value), q_o_sas: Number(document.getElementById('q_o_sas').value), q_o_g1_region: Number(document.getElementById('q_o_g1_region').value), q_o_ses: Number(document.getElementById('q_o_ses').value), q_o_cis: Number(document.getElementById('q_o_cis').value), q_o_iiu: Number(document.getElementById('q_o_iiu').value), q_o_dau: Number(document.getElementById('q_o_dau').value), q_o_oatsu: Number(document.getElementById('q_o_oatsu').value),
-            q_d_ssps: Number(document.getElementById('q_d_ssps').value), q_d_sas: Number(document.getElementById('q_d_sas').value), q_d_g1_region: Number(document.getElementById('q_d_g1_region').value), q_d_ses: Number(document.getElementById('q_d_ses').value), q_d_cis: Number(document.getElementById('q_d_cis').value), q_d_iiu: Number(document.getElementById('q_d_iiu').value), q_d_dau: Number(document.getElementById('q_d_dau').value), q_d_oatsu: Number(document.getElementById('q_d_oatsu').value)
+            ...getValuesByClass('g1'),
+            ...getValuesByClass('g2'),
+            ...getValuesByClass('g3'),
+            ...getValuesByClass('q_o'),
+            ...getValuesByClass('q_d')
         };
 
         const method = editingId ? 'PUT' : 'POST';
@@ -422,19 +448,12 @@
         document.getElementById('submitBtn').style.background = 'var(--warning)';
         document.getElementById('submitBtn').style.color = '#000';
 
-        ['ssps','sas','g1_region','ses','cis','iiu','dau','oatsu','g2_region','male_area','si','ci','ct','cni'].forEach(key => {
-            document.getElementById(key).value = log[key] || 0;
+        // Dynamically fill inputs based on their IDs matching DB keys
+        document.querySelectorAll('input[type="number"]').forEach(input => {
+            if (log[input.id] !== undefined) {
+                input.value = log[input.id];
+            }
         });
-        
-        ['q_o_ssps','q_o_sas','q_o_g1_region','q_o_ses','q_o_cis','q_o_iiu','q_o_dau','q_o_oatsu'].forEach(key => {
-            document.getElementById(key).value = log[key] || 0;
-        });
-        ['q_d_ssps','q_d_sas','q_d_g1_region','q_d_ses','q_d_cis','q_d_iiu','q_d_dau','q_d_oatsu'].forEach(key => {
-            document.getElementById(key).value = log[key] || 0;
-        });
-        
-        document.getElementById('daily_reports').value = log.daily_reports || 0;
-        document.getElementById('weekly_reports').value = log.weekly_reports || 0;
         
         calculateSubTotals(); window.scrollTo({ top: 0, behavior: 'smooth' });
     }
@@ -453,6 +472,21 @@
         document.getElementById('submitBtn').style.background = 'var(--primary)';
         document.getElementById('submitBtn').style.color = '#fff';
         calculateSubTotals();
+    }
+
+    // --- Export Feature ---
+    function exportCSV() {
+        if (!globalLogs || globalLogs.length === 0) return alert("No data to export!");
+        const headers = Object.keys(globalLogs[0]).join(',');
+        const rows = globalLogs.map(obj => Object.values(obj).join(',')).join('\n');
+        const csvContent = "data:text/csv;charset=utf-8," + headers + "\n" + rows;
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", `monitoring_export_${new Date().toISOString().split('T')[0]}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
     }
 
     refreshData();
