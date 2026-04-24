@@ -381,7 +381,7 @@
         if(charts.doughnut) charts.doughnut.destroy();
         charts.doughnut = new Chart(document.getElementById('doughnutChart'), {
             type: 'doughnut',
-            data: { labels: ['IOSU', 'Male Area', 'Si', 'CI', 'Ct', 'Cni'], datasets: [{
+            data: { labels: ['REGION', 'Male Area', 'Si', 'CI', 'Ct', 'Cni'], datasets: [{
                 data: [data.aggregates.g2.region, data.aggregates.g2.male, data.aggregates.g2.si, data.aggregates.g2.ci, data.aggregates.g2.ct, data.aggregates.g2.cni],
                 backgroundColor: ['#10b981', '#34d399', '#059669', '#047857', '#065f46', '#a7f3d0'], borderWidth: 0
             }]},
